@@ -1,16 +1,19 @@
 import Tiptap from "./Tiptap.jsx";
 import './App.css';
 import CollabTiptap from "./CollabTiptap.jsx";
-import React from 'react';
-import {Layout, Breadcrumb, List, Typography} from 'antd';
+import React, {useRef, useState} from 'react';
+import {Layout, Breadcrumb, List, Typography, Button} from 'antd';
 import {useNavigate, useParams} from "react-router-dom";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import {addDocument} from "./api";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Title } = Typography;
 
 const App = () => {
-  const data = [
+  const navigate = useNavigate();
+
+  const [data, setData] = useState([
     {
       title: 'Article 1',
       id: '1'
@@ -19,26 +22,25 @@ const App = () => {
       title: 'Article 2',
       id: '2'
     }
-  ]
+  ])
+  const goEdit = (item) => {
+    navigate(`/edit/${item.id}`);
+  };
+  const addItem = () => {
+    console.log("addItem")
+    addDocument().then((res) =>{
+      console.log(res)
+    })
+    // setData(prev => [
+    //   ...prev,
+    //   {
+    //     title: `Article ${prev.length + 1}`,
+    //     id: `${prev.length + 1}`
+    //   }
+    // ])
+  }
 
-
-  const ArticleList = () => {
-    const data = [
-      {
-        title: 'Article 1',
-        id: '1'
-      },
-      {
-        title: 'Article 2',
-        id: '2'
-      }
-    ];
-    const navigate = useNavigate();
-
-    const goEdit = (item) => {
-      navigate(`/edit/${item.id}`);
-    };
-
+  const ArticleList = ({data, goEdit}) => {
     return (
       <List
         style={{ width: '45%' }}
@@ -54,7 +56,7 @@ const App = () => {
     );
   };
 
-  const EditArea = ({ match }) => {
+  const EditArea = () => {
     const { id } = useParams();
     // Now you can use the id to fetch the article and edit it
     return <div>Edit Area for article {id}</div>;
@@ -62,8 +64,19 @@ const App = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider>
-        文档树菜单
+      <Sider theme="light">
+        <Button onClick={addItem}>新增</Button>
+        <List
+          header={<Title level={3}>Article List</Title>}
+          bordered={false}
+          dataSource={data}
+          renderItem={item => (
+            <List.Item onClick={() => goEdit(item)} style={{cursor: "pointer"}}>
+              {item.title}
+              <Button type="text" style={{marginLeft: "10px"}}>删除</Button>
+            </List.Item>
+          )}
+        />
       </Sider>
       <Layout>
         <Header>
@@ -77,7 +90,7 @@ const App = () => {
           </Breadcrumb>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <Routes>
-              <Route path="/" element={<ArticleList />} />
+              <Route path="/" element={<ArticleList data={data} goEdit={goEdit} />} />
               <Route path="/edit/:id" element={<EditArea />} />
             </Routes>
             {/*<List
