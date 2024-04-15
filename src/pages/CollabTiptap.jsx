@@ -16,8 +16,8 @@ import React, {
 import * as Y from 'yjs'
 
 
-import { variables } from './variables.js'
-import MenuBar from './menubar/MenuBar.jsx'
+import { variables } from '@/variables.js'
+import MenuBar from '@/menubar/MenuBar.jsx'
 
 const colors = ['#958DF1', '#F98181', '#FBBC88', '#FAF594', '#70CFF8', '#94FADB', '#B9F18D']
 const names = [
@@ -67,7 +67,7 @@ const websocketProvider = new TiptapCollabProvider({
   name: room,  //: 发送消息时即 documentName
   document: ydoc,
   //wss://${configuration.appId}.collab.tiptap.cloud
-  baseUrl: 'ws://localhost:1234',
+  baseUrl: 'ws://localhost:4321',
 })
 
 const getInitialUser = () => {
@@ -97,7 +97,7 @@ export default () => {
       // }),
       Collaboration.configure({
         document: ydoc,
-        provider: websocketProvider,
+        // provider: websocketProvider,
       }),
       CollaborationCursor.configure({
         provider: websocketProvider,

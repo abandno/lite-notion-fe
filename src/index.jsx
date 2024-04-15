@@ -1,15 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
+import Home from "@/pages/Home";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter as Router } from 'react-router-dom';
+import {isTrue} from "@/utils";
 
+if (isTrue(process.env.REACT_APP_MOCK_API)) {
+  console.log("=> REACT_APP_MOCK_API is " + process.env.REACT_APP_MOCK_API)
+  require('@/api/mock');
+}
+// import "./api/mock"
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
-      <App/>
+      <Home/>
     </Router>
   </React.StrictMode>,
   document.getElementById("root")

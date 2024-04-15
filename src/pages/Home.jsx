@@ -1,16 +1,16 @@
-import Tiptap from "./Tiptap.jsx";
-import './App.css';
+import './index.css';
 import CollabTiptap from "./CollabTiptap.jsx";
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {Layout, Breadcrumb, List, Typography, Button} from 'antd';
 import {useNavigate, useParams} from "react-router-dom";
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import {addDocument} from "./api";
+import { Route, Routes } from 'react-router-dom';
+import {addDocument, deleteDocument} from "@/api";
+import {removeIf} from "@/utils";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Title } = Typography;
 
-const App = () => {
+const Home = () => {
   const navigate = useNavigate();
 
   const [data, setData] = useState([
@@ -26,18 +26,19 @@ const App = () => {
   const goEdit = (item) => {
     navigate(`/edit/${item.id}`);
   };
-  const addItem = () => {
-    console.log("addItem")
-    addDocument().then((res) =>{
-      console.log(res)
+  const requestAddDocument = () => {
+    console.log("requestAddDocument")
+    addDocument().then((res) => {
+      setData(prev => [
+        ...prev,
+        res.data.data,
+      ])
     })
-    // setData(prev => [
-    //   ...prev,
-    //   {
-    //     title: `Article ${prev.length + 1}`,
-    //     id: `${prev.length + 1}`
-    //   }
-    // ])
+  }
+  const requestDeleteDocument = ({id}) => {
+    deleteDocument().then((res) => {
+      setData(prev => removeIf(prev, e => e.id !== id))
+    })
   }
 
   const ArticleList = ({data, goEdit}) => {
@@ -65,7 +66,7 @@ const App = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider theme="light">
-        <Button onClick={addItem}>新增</Button>
+        <Button onClick={requestAddDocument}>新增</Button>
         <List
           header={<Title level={3}>Article List</Title>}
           bordered={false}
@@ -73,7 +74,7 @@ const App = () => {
           renderItem={item => (
             <List.Item onClick={() => goEdit(item)} style={{cursor: "pointer"}}>
               {item.title}
-              <Button type="text" style={{marginLeft: "10px"}}>删除</Button>
+              <Button type="text" style={{marginLeft: "10px"}} onClick={() => requestDeleteDocument(item)}>删除</Button>
             </List.Item>
           )}
         />
@@ -115,4 +116,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Home;
