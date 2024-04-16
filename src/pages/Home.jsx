@@ -31,7 +31,7 @@ const Home = () => {
     addDocument().then((res) => {
       setData(prev => [
         ...prev,
-        res.data.data,
+        {title: "未命名", ...res.data.data},
       ])
     })
   }
