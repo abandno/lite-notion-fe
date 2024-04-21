@@ -1,14 +1,15 @@
 import './index.css';
-import CollabTiptap from "./CollabTiptap.jsx";
 import React, {useState} from 'react';
 import {Layout, Breadcrumb, List, Typography, Button} from 'antd';
 import {useNavigate, useParams} from "react-router-dom";
-import { Route, Routes } from 'react-router-dom';
-import {addDocument, deleteDocument} from "@/api";
-import {removeIf} from "@/utils";
+import {Route, Routes} from 'react-router-dom';
+import {addDocument, deleteDocument, listDocument} from "@/api";
+import {removeIf, toQueryString} from "@/utils";
+import Editor from "@/pages/editor";
+import {useMount} from "ahooks";
 
-const { Header, Content, Footer, Sider } = Layout;
-const { Title } = Typography;
+const {Header, Content, Footer, Sider} = Layout;
+const {Title} = Typography;
 
 const Home = () => {
   const navigate = useNavigate();
@@ -23,15 +24,22 @@ const Home = () => {
       id: '2'
     }
   ])
+
+  useMount(() => {
+    listDocument().then((res) => {
+      setData(res.data.data);
+    })
+  })
+
   const goEdit = (item) => {
-    navigate(`/edit/${item.id}`);
+    navigate(`/edit/${item.id}?` + toQueryString(item));
   };
   const requestAddDocument = () => {
     console.log("requestAddDocument")
     addDocument().then((res) => {
       setData(prev => [
         ...prev,
-        {title: "未命名", ...res.data.data},
+        res.data.data,
       ])
     })
   }
@@ -57,14 +65,14 @@ const Home = () => {
     );
   };
 
-  const EditArea = () => {
-    const { id } = useParams();
-    // Now you can use the id to fetch the article and edit it
-    return <div>Edit Area for article {id}</div>;
-  };
+  // const EditArea = () => {
+  //   const { id , title} = useParams();
+  //   // Now you can use the id to fetch the article and edit it
+  //   return <div>Edit Area for article {id} {title}</div>;
+  // };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{minHeight: '100vh'}}>
       <Sider theme="light">
         <Button onClick={requestAddDocument}>新增</Button>
         <List
@@ -91,8 +99,8 @@ const Home = () => {
           </Breadcrumb>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <Routes>
-              <Route path="/" element={<ArticleList data={data} goEdit={goEdit} />} />
-              <Route path="/edit/:id" element={<EditArea />} />
+              <Route path="/" element={<ArticleList data={data} goEdit={goEdit}/>}/>
+              <Route path="/edit/:id" element={<Editor />}/>
             </Routes>
             {/*<List
               style={{ width: '45%' }}
