@@ -1,5 +1,5 @@
-import {useLocation, useParams} from "react-router-dom";
-import React, {useEffect, useState, useCallback} from "react";
+import {useLocation} from "react-router-dom";
+import React, {useCallback, useEffect, useState} from "react";
 import {EditorContent, useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
@@ -10,9 +10,9 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import * as Y from 'yjs'
 import {TiptapCollabProvider} from '@hocuspocus/provider'
-import {getRandomElement} from "@/utils";
+import {ClientId, getRandomElement} from "@/utils";
 import "./index.scss"
-import {useMount} from "ahooks";
+import {useMount, useUnmount} from "ahooks";
 
 const colors = ['#958DF1', '#F98181', '#FBBC88', '#FAF594', '#70CFF8', '#94FADB', '#B9F18D']
 
@@ -23,8 +23,25 @@ const getInitialUser = () => {
   }
 }
 
+const buildYdoc = () => {
+  const ydoc = new Y.Doc();
+  // 用一个 clientId 有点问题, 这里的 clientId 定位估计是一个文档对应一个 clientId
+  // ydoc.clientID = ClientId.getClientId();
+  console.log("buildYdoc, clientId", ydoc.clientID);
+  return ydoc
+}
+const buildTiptapCollabProvider = (room, ydoc) => {
+  console.log("buildTiptapCollabProvider", room);
+  return new TiptapCollabProvider({
+    name: room,
+    document: ydoc,
+    baseUrl: 'ws://localhost:4321',
+  });
+}
+
+
 // 封装 editor , 一个文档id对应一个这个实例
-const EditorInner = ({id, title}) => {
+const EditorInner = ({id, title, ydoc, provider}) => {
   // // const { id , title} = useParams();
   // const { search } = useLocation();
   // const params = new URLSearchParams(search);
@@ -32,27 +49,30 @@ const EditorInner = ({id, title}) => {
   // const title = params.get("title");
   // console.log("edit", id, title);
   useMount(() => {
-    console.log("editor mounted ====", id, title);
+    console.log("[EditorInner] editor mounted", id, title);
+  })
+  useUnmount(() => {
+    console.log("[EditorInner] editor unmounted", id, title);
+    if (provider) {
+      try {
+        provider.destroy();
+      } catch (e) {
+        console.log("provider destroy error", e)
+      }
+    }
+    if (ydoc) {
+      try {
+        ydoc.destroy();
+      } catch (e) {
+        console.log("ydoc destroy error", e)
+      }
+    }
   })
 
-  const getYdoc = useCallback(() => {
-    return new Y.Doc();
-  }, [id])
-  const [ydoc, setYdoc] = useState(getYdoc());
-  const getProvider = useCallback(() => {
-    const room = id
-    const provider = new TiptapCollabProvider({
-      name: room,
-      document: ydoc,
-      baseUrl: 'ws://localhost:4321',
-    });
-
-    return provider;
-  }, [ydoc])
   const [status, setStatus] = useState('connecting')
-  const [websocketProvider, setWebsocketProvider] = useState(getProvider);
+  // const [websocketProvider, setWebsocketProvider] = useState(null);
   const [currentUser, setCurrentUser] = useState(getInitialUser)
-
+  // console.log("currentUser", currentUser);
 
   // useEffect(() => {
   //   const room = id
@@ -92,9 +112,16 @@ const EditorInner = ({id, title}) => {
         // provider: websocketProvider,
       }),
       CollaborationCursor.configure({
-        provider: websocketProvider,
+        provider: provider,
       }),
     ],
+  }, [ydoc, provider]);
+
+  useEffect(() => {
+    // Update status changes
+    provider.on('status', event => {
+      setStatus(event.status)
+    })
   })
 
   // Save current user to localStorage and emit to editor
@@ -116,7 +143,6 @@ const EditorInner = ({id, title}) => {
   return (
       <div className="editor">
         <div>Edit Area for article {id} {title}</div>
-        ;
         {/*{editor && <MenuBar editor={editor} />}*/}
         <EditorContent className="editor__content" editor={editor}/>
         <div className="editor__footer">
@@ -139,10 +165,24 @@ export default () => {
   const params = new URLSearchParams(search);
   const id = params.get("id");
   const title = params.get("title");
-  console.log("edit", id, title);
-  return (
+  useMount(() => {
+    console.log("[Editor] editor mounted", id, title);
+  })
+  useUnmount(() => {
+    console.log("[Editor] editor unmounted", id, title);
+  })
+  const [ydoc, setYdoc] = useState(null);
+  const [websocketProvider, setWebsocketProvider] = useState(null);
+  useEffect(() => {
+    const ydoc = buildYdoc();
+    setYdoc(ydoc);
+    var provider = buildTiptapCollabProvider(id, ydoc);
+    setWebsocketProvider(provider);
+  }, [id])
+  const editorReady = ydoc && websocketProvider;
+  return editorReady && (
       <div key={id}>
-        <EditorInner id={id} title={title}/>
+        <EditorInner id={id} title={title} ydoc={ydoc} provider={websocketProvider}/>
       </div>
   )
 }
