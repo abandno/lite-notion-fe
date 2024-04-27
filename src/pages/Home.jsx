@@ -7,6 +7,7 @@ import {addDocument, deleteDocument, listDocument} from "@/api";
 import {removeIf, toQueryString} from "@/utils";
 import Editor from "@/pages/editor";
 import {useMount} from "ahooks";
+import DocMenuTree from "@/pages/DocMenuTree";
 
 const {Header, Content, Footer, Sider} = Layout;
 const {Title} = Typography;
@@ -25,11 +26,11 @@ const Home = () => {
     }
   ])
 
-  useMount(() => {
-    listDocument().then((res) => {
-      setData(res.data.data);
-    })
-  })
+  // useMount(() => {
+  //   listDocument().then((res) => {
+  //     setData(res.data.data);
+  //   })
+  // })
 
   const goEdit = (item) => {
     navigate(`/edit/${item.id}?` + toQueryString(item));
@@ -74,18 +75,19 @@ const Home = () => {
   return (
     <Layout style={{minHeight: '100vh'}}>
       <Sider theme="light">
-        <Button onClick={requestAddDocument}>新增</Button>
-        <List
-          header={<Title level={3}>Article List</Title>}
-          bordered={false}
-          dataSource={data}
-          renderItem={item => (
-            <List.Item onClick={() => goEdit(item)} style={{cursor: "pointer"}}>
-              {item.title}
-              <Button type="text" style={{marginLeft: "10px"}} onClick={() => requestDeleteDocument(item)}>删除</Button>
-            </List.Item>
-          )}
-        />
+        {/*<Button onClick={requestAddDocument}>新增</Button>*/}
+        {/*<List*/}
+        {/*  header={<Title level={3}>Article List</Title>}*/}
+        {/*  bordered={false}*/}
+        {/*  dataSource={data}*/}
+        {/*  renderItem={item => (*/}
+        {/*    <List.Item onClick={() => goEdit(item)} style={{cursor: "pointer"}}>*/}
+        {/*      {item.title}*/}
+        {/*      <Button type="text" style={{marginLeft: "10px"}} onClick={() => requestDeleteDocument(item)}>删除</Button>*/}
+        {/*    </List.Item>*/}
+        {/*  )}*/}
+        {/*/>*/}
+        <DocMenuTree />
       </Sider>
       <Layout>
         <Header>
