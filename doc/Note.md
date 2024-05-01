@@ -14,7 +14,7 @@ Mock.mock(baseUrl + '/document/add' ...
 
 [最好用的 6 个 React Tree select 树形组件测评与推荐 - 掘金](https://juejin.cn/post/7106028870742048804)
 
-react-sortable-tree 停止维护了, 最近更新五六年前的.  
+react-sortable-tree 停止维护了, 最近更新五六年前的.
 [react-sortable-tree alternatives · frontend-collective/react-sortable-tree · Discussion #942](https://github.com/frontend-collective/react-sortable-tree/discussions/942)
 fork 版
 [nosferatu500/react-sortable-tree: Drag-and-drop sortable component for nested data and hierarchies](https://github.com/nosferatu500/react-sortable-tree)
@@ -24,6 +24,8 @@ fork 版
 
 react-dnd-treeview 拖拽.
 
+react-sortable-tree 不支持 react strictMode ??
+[Cannot have two HTML5 backends at the same time · Issue #30 · nosferatu500/react-sortable-tree](https://github.com/nosferatu500/react-sortable-tree/issues/30)
 
 ## js\jsx\ts\tsx 都支持jsx语法怎么做?
 

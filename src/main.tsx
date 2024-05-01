@@ -13,9 +13,9 @@ if (isTrue(process.env.REACT_APP_MOCK_API)) {
 // import "./api/mock"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
+    // <React.StrictMode>
       <Router>
         <Home/>
       </Router>
-    </React.StrictMode>
+    // </React.StrictMode>
 )

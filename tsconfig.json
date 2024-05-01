@@ -16,13 +16,14 @@
 
     /* Linting */
     "strict": false,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src", "tests"],
   "references": [{ "path": "./tsconfig.node.json" }],
