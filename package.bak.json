@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@hocuspocus/provider": "^2.11.2",
     "@hocuspocus/server": "^2.11.2",
     "@mui/icons-material": "^5.15.15",
@@ -11,6 +13,7 @@
     "@nosferatu500/react-sortable-tree": "^4.4.0",
     "@nosferatu500/theme-file-explorer": "file:../theme-file-explorer",
     "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@tiptap/extension-character-count": "^2.2.3",
     "@tiptap/extension-collaboration": "^2.2.3",
@@ -30,16 +33,22 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
+    "react-scripts": "^5.0.1",
     "remixicon": "^4.1.0",
-    "scss": "^0.2.4",
     "web-vitals": "^2.1.4",
     "yjs": "^13.6.12"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
@@ -54,18 +63,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-react": "^7.24.1",
     "@types/jest": "^29.5.12",
-    "@types/react": "^18.2.66",
-    "@types/react-dom": "^18.2.22",
-    "@typescript-eslint/eslint-plugin": "^7.2.0",
-    "@typescript-eslint/parser": "^7.2.0",
-    "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.6",
-    "sass": "^1.76.0",
+    "customize-cra": "^1.0.0",
+    "react-app-rewired": "^2.2.1",
+    "sass": "^1.71.0",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0"
   }
 }
