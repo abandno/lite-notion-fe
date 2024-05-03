@@ -1,13 +1,13 @@
 import {post, get} from "@/utils/request";
 
-export function addDocument() {
-  return post('/api/document/add', {});
+export function addDocument(param) {
+  return post('/api/document/add', param);
 }
 
-export function deleteDocument() {
-  return post('/api/document/delete', {});
+export function deleteDocument(param) {
+  return post('/api/document/delete', param);
 }
 
-export function listDocument() {
-  return get('/api/document/list', {});
+export function listDocument(param) {
+  return get('/api/document/list', param);
 }

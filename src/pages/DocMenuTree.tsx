@@ -11,7 +11,7 @@ import '@nosferatu500/react-sortable-tree/style.css'; // This only needs to be i
 import FileExplorerTheme from '@/components/theme-file-explorer'
 import {Button, Modal, Dropdown, MenuProps} from "antd";
 import {useMount} from "ahooks";
-import {listDocument} from "@/api";
+import {addDocument, deleteDocument, listDocument} from "@/api";
 import {HeartIcon, MoreIcon} from "@/components/icons";
 import {DeleteOutlined} from "@ant-design/icons";
 
@@ -64,8 +64,8 @@ export default function DocMenuTree() {
   ]);
 
   useMount(() => {
-    listDocument().then((res) => {
-      const flatItems = res.data.data;
+    listDocument({userId: 1}).then((res) => {
+      const flatItems = res.data;
       flatItems.forEach((e, ix) => {
         e.title = e.title || "未命名-" + ix
       });
@@ -98,8 +98,10 @@ export default function DocMenuTree() {
     console.log('isDragging:', isDragging, 'draggedNode:', draggedNode);
   }
 
-  const handleAddDoc = ({node, path}) => {
+  const handleAddDoc = async ({node, path}) => {
     console.log("handleAddDoc", node, path);
+
+    let resp = await addDocument({pid: node.id, level: node.level + 1});
     setTreeData(
         addNodeUnderParent({
           treeData,
@@ -107,23 +109,29 @@ export default function DocMenuTree() {
           // parentKey: node.id,
           expandParent: true,
           getNodeKey,
-          newNode: {
-            title: `addNode-${new Date()}`,
-          },
+          newNode: resp.data,
           addAsFirstChild: false,
         }).treeData
     );
   }
-  const handleDeleteDoc = ({node, path}) => {
+  const handleDeleteDoc = async ({node, path}) => {
     console.log("handleDeleteDoc", node, path);
-    setTreeData(
-        removeNodeAtPath({
-          treeData,
-          path,
-          // path: [...path, node.id],
-          getNodeKey,
-        })
-    );
+    const confirm = Modal.confirm({
+      title: `确认删除 '${node.title}'(${node.id})?`,
+      // content: '',
+      async onOk() {
+        await deleteDocument({id: node.id})
+        setTreeData(
+            removeNodeAtPath({
+              treeData,
+              path,
+              getNodeKey,
+            })
+        );
+      },
+      onCancel() {
+      },
+    });
   }
 
   return (
