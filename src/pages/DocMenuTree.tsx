@@ -62,6 +62,7 @@ export default function DocMenuTree() {
     {title: 'Chicken', children: [{title: 'Egg'}]},
     {title: 'Fish', children: [{title: 'fingerline'}]},
   ]);
+  const [isDragging, setIsDragging] = useState(false);
 
   useMount(() => {
     listDocument({userId: 1}).then((res) => {
@@ -81,21 +82,17 @@ export default function DocMenuTree() {
     })
   })
 
-
+  // isDragging true -> onChange -> onMoveNode -> isDragging false
   const onTreeChange = async (newTreeData) => {
-    console.log(newTreeData);
-    // const confirm = Modal.confirm({
-    //   title: '权限确认?',
-    //   content: '将继承新的父文档权限, 是否保留原有权限? 是|否',
-    //   onOk() {
-    //     setTreeData(newTreeData);
-    //   },
-    //   onCancel() {},
-    // });
-    setTreeData(newTreeData);
+    console.log("onTreeChange", newTreeData);
+    console.log("onTreeChange: treeData.length:", newTreeData.length);
+    if (!isDragging) {
+      setTreeData(newTreeData);
+    } // 拖拽移动时, 在 onMoveNode 中判断是否更新
   }
   const onDragStateChanged = ({isDragging, draggedNode}) => {
     console.log('isDragging:', isDragging, 'draggedNode:', draggedNode);
+    setIsDragging(isDragging);
   }
 
   const handleAddDoc = async ({node, path}) => {
@@ -142,12 +139,24 @@ export default function DocMenuTree() {
             onChange={onTreeChange}
             theme={FileExplorerTheme}
             onDragStateChanged={onDragStateChanged}
+            onMoveNode={({treeData, node, nextParentNode, prevPath, nextPath}) => {
+              console.log('onMoveNode: Node:', node, 'Next Parent Node:', nextParentNode, 'Previous Path:', prevPath, 'Next Path:', nextPath);
+              // console.log("onMoveNode: treeData.length:", treeData.length);
+              const confirm = Modal.confirm({
+                title: '权限确认?',
+                content: '将继承新的父文档权限, 是否保留原有权限? 是|否',
+                onOk() {
+                  setTreeData(treeData);
+                },
+                onCancel() {},
+              });
+            }}
             generateNodeProps={({node, path}) => ({
               onClick: () => console.log('Node clicked:', node, path),
               onDoubleClick: () => {
                 node.expanded = !node.expanded;
                 setTreeData(treeData => treeData.slice());
-                console.log('Node expanded:', node.expanded);
+                // console.log('onDoubleClick: Node expanded:', node.expanded);
               },
               onMouseEnter: () => {
                 node.isHovering = true;
