@@ -17,6 +17,7 @@ export const HeartIcon = (props: Partial<CustomIconComponentProps>) => (
 
 export const MoreIcon = (props: Partial<CustomIconComponentProps>) => (
     <Icon component={() => (
+        // @ts-ignore
         <svg width="1em" height="1em" fill="currentColor" t="1714663752570" className="icon" viewBox="0 0 1024 1024"
              version="1.1" xmlns="http://www.w3.org/2000/svg"
              p-id="4263">

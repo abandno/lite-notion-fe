@@ -25,3 +25,18 @@ export function toQueryString(obj={}) {
     .map(key => key + "=" + obj[key])
     .join("&");
 }
+
+/**
+ * 数组中查找符合条件的元素, 返回 (e,ix)
+ */
+export function find(arr, fn) {
+  if (arr == null) {
+    return null;
+  }
+  for (let i = 0; i < arr.length; i++) {
+    if (fn(arr[i], i)) {
+      return [arr[i], i];
+    }
+  }
+  return null;
+}

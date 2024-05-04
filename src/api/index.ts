@@ -11,3 +11,7 @@ export function deleteDocument(param) {
 export function listDocument(param) {
   return get('/api/document/list', param);
 }
+
+export function moveNode(param) {
+  return post('/api/moveNode', param);
+}

@@ -30,3 +30,10 @@ react-sortable-tree 不支持 react strictMode ??
 ## js\jsx\ts\tsx 都支持jsx语法怎么做?
 
 [解决Vite-React项目中.js使用jsx语法报错的问题 - 掘金](https://juejin.cn/post/7018128782225571853)
+
+## 节点顺序问题设计
+
+[菜单拽托排序的数据库设计_拖动排序数据库设计-CSDN博客](https://blog.csdn.net/xyc1211/article/details/125722958)
+[《SQL 反模式》 学习笔记 - 小蒋不素小蒋 - 博客园](https://www.cnblogs.com/xjnotxj/p/12734792.html#4220975300)
+邻接表, 闭包表
+[拖拽排序后端设计与实现 - 简书](https://www.jianshu.com/p/9ee708e43ebf)
