@@ -87,7 +87,7 @@ const Home = () => {
         {/*    </List.Item>*/}
         {/*  )}*/}
         {/*/>*/}
-        <DocMenuTree />
+        <DocMenuTree onSelectedChange={goEdit} />
       </Sider>
       <Layout>
         <Header>

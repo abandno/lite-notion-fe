@@ -4,12 +4,19 @@
   cursor: pointer;
 
   &:hover {
-    opacity: 0.7;
+    //opacity: 0.7;
+    background-color: $hoverBackgroundColor;
   }
 
   &:active {
     opacity: 1;
+    color: $focusColor;
   }
+}
+
+.rowSelected {
+    background-color: $focusBackgroundColor;
+    color: $focusColor;
 }
 
 .rowWrapperDragDisabled {
@@ -22,6 +29,7 @@
   display: flex;
   position: relative;
   padding: 3px;
+  flex-grow: 1;
 
   & > * {
     box-sizing: border-box;
@@ -97,6 +105,8 @@
   @extend %rowItem;
   flex: 0 1 auto;
   padding-right: 20px;
+  // 有剩余空间时, 占满, 从而将 buttons 挤到右边
+  flex-grow: 1;
 }
 
 .rowToolbar {

@@ -13,5 +13,5 @@ export function listDocument(param) {
 }
 
 export function moveNode(param) {
-  return post('/api/moveNode', param);
+  return post('/api/document/moveNode', param);
 }

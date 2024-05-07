@@ -45,6 +45,7 @@ class FileThemeNodeContentRenderer extends Component {
       isOver, // Not needed, but preserved for other renderers
       parentNode, // Needed for dndManager
       disableDropFromOutside,
+      selectedNode,
       rowHeight,
       ...otherProps
     } = this.props;
@@ -95,7 +96,9 @@ class FileThemeNodeContentRenderer extends Component {
     });
 
     const nodeContent = (
-      <div style={{ height: '100%' }} {...otherProps}>
+      <div style={{ height: '100%' }} {...otherProps}
+           className={selectedNode?.id === node.id ? styles.rowSelected : ''}
+      >
         {toggleChildrenVisibility && node.children && node.children.length > 0 && (
           <button
             type="button"

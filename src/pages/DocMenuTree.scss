@@ -1,0 +1,32 @@
+
+.doc-menu-tree {
+  .ant-collapse-header {
+    align-items: center !important;
+    &:focus {
+      background-color: $focusBackgroundColor !important;
+      border-radius: 5px !important;;
+      color: $focusColor;
+    }
+
+    &:hover {
+      background-color: $hoverBackgroundColor;
+      border-radius: 5px !important;
+    }
+  }
+
+  .focus {
+    background-color: $focusBackgroundColor !important;
+    border-radius: 5px !important;;
+    color: $focusColor;
+  }
+
+  .hover {
+    background-color: $hoverBackgroundColor;
+    border-radius: 5px !important;
+  }
+
+  .focus.hover {
+    background-color: $focusBackgroundColor !important;
+  }
+
+}

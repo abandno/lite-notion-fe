@@ -5,7 +5,9 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+      react(),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src')
@@ -13,7 +15,11 @@ export default defineConfig({
   },
   css: {
     preprocessorOptions: {
-      scss: {}
+      scss: {
+        // 文件路径，注意最后需要添加 ';'
+        additionalData: '@import "@/styles/variable.scss";',
+        javascriptEnabled: true
+      }
     }
   },
   define: {
