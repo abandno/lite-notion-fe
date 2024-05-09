@@ -1,4 +1,3 @@
-import './index.css';
 import React, {useState} from 'react';
 import {Layout, Breadcrumb, List, Typography, Button} from 'antd';
 import {useNavigate, useParams} from "react-router-dom";
@@ -99,7 +98,7 @@ const Home = () => {
             <Breadcrumb.Item>List</Breadcrumb.Item>
             <Breadcrumb.Item>App</Breadcrumb.Item>
           </Breadcrumb>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div>
             <Routes>
               <Route path="/" element={<ArticleList data={data} goEdit={goEdit}/>}/>
               <Route path="/edit/:id" element={<Editor />}/>
@@ -115,9 +114,9 @@ const Home = () => {
                 </List.Item>
               )}
             />*/}
-            <div style={{ width: '45%' }}>
-              {/* Add article description here */}
-            </div>
+            {/*<div style={{ width: '45%' }}>*/}
+            {/*  /!* Add article description here *!/*/}
+            {/*</div>*/}
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>

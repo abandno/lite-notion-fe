@@ -181,7 +181,7 @@ export default () => {
   }, [id])
   const editorReady = ydoc && websocketProvider;
   return editorReady && (
-      <div key={id}>
+      <div className={"page-zone"} key={id}>
         <EditorInner id={id} title={title} ydoc={ydoc} provider={websocketProvider}/>
       </div>
   )
