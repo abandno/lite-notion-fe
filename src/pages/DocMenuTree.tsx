@@ -40,7 +40,7 @@ const DocMenuProvider = ({children}) => {
 const getNodeKey = ({node, treeIndex=undefined}) => node.id
 
 const NodeDropdown = ({node, path, onAddDoc, onDeleteDoc}) => {
-  const style = {
+  const style: CSSProperties = {
     display: node.isHovering ? "inline" : "none",
     float: "right",
   }

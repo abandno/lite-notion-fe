@@ -13,6 +13,8 @@ import {TiptapCollabProvider} from '@hocuspocus/provider'
 import {ClientId, getRandomElement} from "@/utils";
 import "./index.scss"
 import {useMount, useUnmount} from "ahooks";
+import { ExtensionKit } from '@components/extensions/extension-kit'
+
 
 const colors = ['#958DF1', '#F98181', '#FBBC88', '#FAF594', '#70CFF8', '#94FADB', '#B9F18D']
 
@@ -95,15 +97,18 @@ const EditorInner = ({id, title, ydoc, provider}) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        history: false,
+      ...ExtensionKit({
+        provider,
       }),
-      Highlight,
-      TaskList,
-      TaskItem,
-      CharacterCount.configure({
-        limit: 10000,
-      }),
+      // StarterKit.configure({
+      //   history: false,
+      // }),
+      // Highlight,
+      // TaskList,
+      // TaskItem,
+      // CharacterCount.configure({
+      //   limit: 10000,
+      // }),
       // Collaboration.configure({
       //   document: ydoc,
       // }),
