@@ -21,7 +21,13 @@ export default defineConfig({
         additionalData: '@import "@/styles/variable.scss";',
         javascriptEnabled: true
       }
-    }
+    },
+    postcss: {
+      plugins: [
+        require('tailwindcss'),
+        require('autoprefixer'),
+      ],
+    },
   },
   define: {
     'process.env': process.env

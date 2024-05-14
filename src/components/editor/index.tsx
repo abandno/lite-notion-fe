@@ -11,9 +11,10 @@ import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import * as Y from 'yjs'
 import {TiptapCollabProvider} from '@hocuspocus/provider'
 import {ClientId, getRandomElement} from "@/utils";
-import "./index.scss"
 import {useMount, useUnmount} from "ahooks";
 import { ExtensionKit } from '@components/extensions/extension-kit'
+import "./index.scss"
+import '@/styles/editor/index.css'
 
 
 const colors = ['#958DF1', '#F98181', '#FBBC88', '#FAF594', '#70CFF8', '#94FADB', '#B9F18D']
