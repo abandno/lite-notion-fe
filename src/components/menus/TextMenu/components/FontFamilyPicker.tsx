@@ -3,7 +3,8 @@ import { Icon } from '@/components/ui/Icon'
 import { Surface } from '@/components/ui/Surface'
 import { Toolbar } from '@/components/ui/Toolbar'
 import * as Dropdown from '@radix-ui/react-dropdown-menu'
-import { useCallback } from 'react'
+import {useCallback} from 'react'
+import {PopoverDropdown} from "@components/menus/PopoverDropdown.tsx";
 
 const FONT_FAMILY_GROUPS = [
   {
@@ -38,38 +39,74 @@ export type FontFamilyPickerProps = {
   value: string
 }
 
-export const FontFamilyPicker = ({ onChange, value }: FontFamilyPickerProps) => {
+// export const FontFamilyPicker = ({ onChange, value }: FontFamilyPickerProps) => {
+//   const currentValue = FONT_FAMILIES.find(size => size.value === value)
+//   const currentFontLabel = currentValue?.label.split(' ')[0] || 'Inter'
+//
+//   const selectFont = useCallback((font: string) => () => onChange(font), [onChange])
+//
+//   return (
+//     <Dropdown.Root>
+//       <Dropdown.Trigger asChild>
+//         <Toolbar.Button active={!!currentValue?.value}>
+//           {currentFontLabel}
+//           <Icon name="ChevronDown" className="w-2 h-2" />
+//         </Toolbar.Button>
+//       </Dropdown.Trigger>
+//       <Dropdown.Content asChild>
+//         <Surface className="flex flex-col gap-1 px-2 py-4">
+//           {FONT_FAMILY_GROUPS.map(group => (
+//             <div className="mt-2.5 first:mt-0 gap-0.5 flex flex-col" key={group.label}>
+//               <DropdownCategoryTitle>{group.label}</DropdownCategoryTitle>
+//               {group.options.map(font => (
+//                 <DropdownButton
+//                   isActive={value === font.value}
+//                   onClick={selectFont(font.value)}
+//                   key={`${font.label}_${font.value}`}
+//                 >
+//                   <span style={{ fontFamily: font.value }}>{font.label}</span>
+//                 </DropdownButton>
+//               ))}
+//             </div>
+//           ))}
+//         </Surface>
+//       </Dropdown.Content>
+//     </Dropdown.Root>
+//   )
+// }
+
+export const FontFamilyPicker = ({onChange, value}: FontFamilyPickerProps) => {
   const currentValue = FONT_FAMILIES.find(size => size.value === value)
   const currentFontLabel = currentValue?.label.split(' ')[0] || 'Inter'
 
   const selectFont = useCallback((font: string) => () => onChange(font), [onChange])
 
   return (
-    <Dropdown.Root>
-      <Dropdown.Trigger asChild>
-        <Toolbar.Button active={!!currentValue?.value}>
-          {currentFontLabel}
-          <Icon name="ChevronDown" className="w-2 h-2" />
-        </Toolbar.Button>
-      </Dropdown.Trigger>
-      <Dropdown.Content asChild>
-        <Surface className="flex flex-col gap-1 px-2 py-4">
-          {FONT_FAMILY_GROUPS.map(group => (
-            <div className="mt-2.5 first:mt-0 gap-0.5 flex flex-col" key={group.label}>
-              <DropdownCategoryTitle>{group.label}</DropdownCategoryTitle>
-              {group.options.map(font => (
-                <DropdownButton
-                  isActive={value === font.value}
-                  onClick={selectFont(font.value)}
-                  key={`${font.label}_${font.value}`}
-                >
-                  <span style={{ fontFamily: font.value }}>{font.label}</span>
-                </DropdownButton>
-              ))}
-            </div>
-          ))}
-        </Surface>
-      </Dropdown.Content>
-    </Dropdown.Root>
+      <PopoverDropdown
+          trigger={(
+              <Toolbar.Button active={!!currentValue?.value}>
+                {currentFontLabel}
+                <Icon name="ChevronDown" className="w-2 h-2"/>
+              </Toolbar.Button>
+          )}
+          content={(
+              <Surface className="flex flex-col gap-1 px-2 py-4">
+                {FONT_FAMILY_GROUPS.map(group => (
+                    <div className="mt-2.5 first:mt-0 gap-0.5 flex flex-col" key={group.label}>
+                      <DropdownCategoryTitle>{group.label}</DropdownCategoryTitle>
+                      {group.options.map(font => (
+                          <DropdownButton
+                              isActive={value === font.value}
+                              onClick={selectFont(font.value)}
+                              key={`${font.label}_${font.value}`}
+                          >
+                            <span style={{fontFamily: font.value}}>{font.label}</span>
+                          </DropdownButton>
+                      ))}
+                    </div>
+                ))}
+              </Surface>
+          )}
+      />
   )
 }

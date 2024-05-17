@@ -61,9 +61,55 @@ const useContentItemActions = (editor: Editor, currentNode: Node | null, current
 
           return true
         })
-        .focus(focusPos)
-        .run()
+          .focus(focusPos)
+          .run()
     }
+  }, [currentNode, currentNodePos, editor])
+
+  /**
+   * 外部聚焦, 光标定位到首行
+   */
+  const handleEnterFocus = useCallback((focusPos) => {
+    // ~~首行空行, 光标定位到首行; 首行有内容, 插入空行~~
+    // const focusVirtualNode = {node: null, editor, pos: focusPos}
+    // 光标定位到首行行首
+    editor.chain().focus(focusPos).run();
+    // console.log("currentNode", currentNode, "currentNodePos", currentNodePos);
+    // ??? 按回车, 一会儿光标在第一行, 一会儿光标在第二行
+    // editor
+    //     .chain()
+    //     .command(({dispatch, tr, state}) => {
+    //       if (dispatch) {
+    //
+    //         tr.insert(0, state.schema.nodes.paragraph.create(null));
+    //
+    //         return dispatch(tr)
+    //       }
+    //
+    //       return true
+    //     })
+    //     .focus(1)
+    //     .run()
+
+    // const currentNodeIsEmptyParagraph = currentNode?.content?.size === 0
+    //
+    // if (currentNodeIsEmptyParagraph) {
+    //   editor.chain().focus(currentNodePos).run();
+    // } else {
+    //   // editor.chain().insert(insertPos, editor.state.schema.nodes.paragraph.create()).focus(focusPos).run();
+    //   editor
+    //       .chain()
+    //       .command(({dispatch, tr, state}) => {
+    //         if (dispatch) {
+    //           tr.insert(currentNodePos, state.schema.nodes.paragraph.create())
+    //           return dispatch(tr)
+    //         }
+    //
+    //         return true
+    //       })
+    //       .focus(currentNodePos)
+    //       .run()
+    // }
   }, [currentNode, currentNodePos, editor])
 
   return {
@@ -72,6 +118,7 @@ const useContentItemActions = (editor: Editor, currentNode: Node | null, current
     copyNodeToClipboard,
     deleteNode,
     handleAdd,
+    handleEnterFocus,
   }
 }
 

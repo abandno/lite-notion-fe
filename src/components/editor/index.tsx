@@ -1,5 +1,5 @@
 import {useLocation} from "react-router-dom";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {EditorContent, useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
@@ -12,9 +12,15 @@ import * as Y from 'yjs'
 import {TiptapCollabProvider} from '@hocuspocus/provider'
 import {ClientId, getRandomElement} from "@/utils";
 import {useMount, useUnmount} from "ahooks";
-import { ExtensionKit } from '@components/extensions/extension-kit'
+import {ExtensionKit} from '@components/extensions/extension-kit'
 import "./index.scss"
 import '@/styles/editor/index.css'
+import {TextMenu} from '../menus/TextMenu'
+import {ContentItemMenu} from '@components/menus'
+import ImageBlockMenu from '@components/extensions/ImageBlock/components/ImageBlockMenu'
+import {ColumnsMenu} from '@components/extensions/MultiColumn/menus'
+import {TableColumnMenu, TableRowMenu} from '@components/extensions/Table/menus'
+import useContentItemActions from "@components/menus/ContentItemMenu/hooks/useContentItemActions.tsx";
 
 
 const colors = ['#958DF1', '#F98181', '#FBBC88', '#FAF594', '#70CFF8', '#94FADB', '#B9F18D']
@@ -42,6 +48,35 @@ const buildTiptapCollabProvider = (room, ydoc) => {
   });
 }
 
+const DocumentTitle = ({editor, id, title}) => {
+  const [titleValue, setTitleValue] = useState(title);
+  const actions = useContentItemActions(editor, null, 1)
+
+  return (
+      <div className="doc-title-zone caret-black dark:caret-white outline-0 pr-8 pl-20 py-4 z-0 lg:pl-8 lg:pr-8;">
+        <div className="mx-auto max-w-2xl">
+          <input type="text" className="text-3xl font-bold my-4 focus:outline-none bg-transparent"
+                 value={titleValue}
+                 placeholder="输入标题"
+                 onChange={(e) => {
+                   setTitleValue(e.target.value);
+                 }}
+                 onKeyDown={(e) => {
+                   // console.log("keydown", e);
+                   if (e.key === 'Enter' || e.keyCode === 13) {
+                     e.preventDefault(); // 阻止默认的回车行为
+                     actions.handleEnterFocus(1);
+                   }
+                 }}
+          />
+          <p className="text-sm space-x-4">
+            <span>张飞</span><span>2024年5月17日 23:41:05</span>
+          </p>
+        </div>
+      </div>
+  )
+}
+
 
 // 封装 editor , 一个文档id对应一个这个实例
 const EditorInner = ({id, title, ydoc, provider}) => {
@@ -51,6 +86,7 @@ const EditorInner = ({id, title, ydoc, provider}) => {
   // const id = params.get("id");
   // const title = params.get("title");
   // console.log("edit", id, title);
+  const menuContainerRef = useRef(null)
   useMount(() => {
     console.log("[EditorInner] editor mounted", id, title);
   })
@@ -146,12 +182,26 @@ const EditorInner = ({id, title, ydoc, provider}) => {
     }
   }, [currentUser])
 
+  if (!editor) {
+    return null
+  }
+
   return (
-      <div className="editor">
-        <div>Edit Area for article {id} {title}</div>
+      <div className="editor flex flex-col" ref={menuContainerRef}>
         {/*{editor && <MenuBar editor={editor} />}*/}
-        <EditorContent className="editor__content" editor={editor}/>
-        <div className="editor__footer">
+        <div className="relative flex flex-col flex-1 overflow-hidden">
+          <DocumentTitle editor={editor} id={id} title={title}/>
+          {/*className="editor__content"*/}
+          <EditorContent editor={editor} className="flex-1 overflow-y-auto"/>
+          <ContentItemMenu editor={editor}/>
+          {/*选中内容上方的一行工具按钮*/}
+          <TextMenu editor={editor}/>
+          <ColumnsMenu editor={editor} appendTo={menuContainerRef}/>
+          <TableRowMenu editor={editor} appendTo={menuContainerRef}/>
+          <TableColumnMenu editor={editor} appendTo={menuContainerRef}/>
+          <ImageBlockMenu editor={editor} appendTo={menuContainerRef}/>
+        </div>
+        {/*<div className="editor__footer">
           <div className={`editor__status editor__status--${status}`}>
             {status === 'connected'
                 ? `${editor.storage.collaborationCursor.users.length} user${editor.storage.collaborationCursor.users.length === 1 ? '' : 's'} online in ${id} ${title}`
@@ -160,12 +210,12 @@ const EditorInner = ({id, title, ydoc, provider}) => {
           <div className="editor__name">
             <button onClick={setName}>{currentUser.name}</button>
           </div>
-        </div>
+        </div>*/}
       </div>
   )
 }
 
-export default () => {
+export const Editor = () => {
   // const { id , title} = useParams();
   const {search} = useLocation();
   const params = new URLSearchParams(search);

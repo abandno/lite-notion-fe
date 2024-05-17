@@ -42,3 +42,6 @@ react-sortable-tree 不支持 react strictMode ??
 ## ahooks
 
 [ahooks 3.0](https://ahooks.js.org/)
+
+## Lucide 图标库
+https://lucide.dev/icons/

@@ -13,6 +13,9 @@ import { useTextmenuContentTypes } from './hooks/useTextmenuContentTypes'
 import { ContentTypePicker } from './components/ContentTypePicker'
 import { AIDropdown } from './components/AIDropdown'
 import { EditLinkPopover } from './components/EditLinkPopover'
+import {DropdownButton, DropdownCategoryTitle} from "@components/ui/Dropdown";
+import * as Dropdown from '@radix-ui/react-dropdown-menu'
+
 
 // We memorize the button so each button is not rerendered
 // on every editor state change
@@ -25,6 +28,39 @@ const MemoContentTypePicker = memo(ContentTypePicker)
 export type TextMenuProps = {
   editor: Editor
 }
+
+// const TestPicker = ({options}) => {
+//   return (
+//       <Popover.Root>
+//         <Popover.Trigger asChild>
+//           <Toolbar.Button tooltip="test" >
+//             <Icon name={'Pilcrow'} />
+//             <Icon name="ChevronDown" className="w-2 h-2" />
+//           </Toolbar.Button>
+//         </Popover.Trigger>
+//         <Popover.Content asChild>
+//           <Surface className="flex flex-col gap-1 px-2 py-4">
+//             {options.map(option => {
+//               if (option.type === 'option') {
+//                 return (
+//                     <DropdownButton key={option.id} onClick={option.onClick} isActive={option.isActive()}>
+//                       <Icon name={option.icon} className="w-4 h-4 mr-1" />
+//                       {option.label}
+//                     </DropdownButton>
+//                 )
+//               } else {
+//                 return (
+//                     <div className="mt-2 first:mt-0" key={option.id}>
+//                       <DropdownCategoryTitle key={option.id}>{option.label}</DropdownCategoryTitle>
+//                     </div>
+//                 )
+//               }
+//             })}
+//           </Surface>
+//         </Popover.Content>
+//       </Popover.Root>
+//   )
+// }
 
 export const TextMenu = ({ editor }: TextMenuProps) => {
   const commands = useTextmenuCommands(editor)
@@ -40,7 +76,7 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
       updateDelay={100}
     >
       <Toolbar.Wrapper>
-        <AIDropdown
+        {/*<AIDropdown
           onCompleteSentence={commands.onCompleteSentence}
           onEmojify={commands.onEmojify}
           onFixSpelling={commands.onFixSpelling}
@@ -51,7 +87,7 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
           onTone={commands.onTone}
           onTranslate={commands.onTranslate}
         />
-        <Toolbar.Divider />
+        <Toolbar.Divider />*/}
         <MemoContentTypePicker options={blockOptions} />
         <MemoFontFamilyPicker onChange={commands.onSetFont} value={states.currentFont || ''} />
         <MemoFontSizePicker onChange={commands.onSetFontSize} value={states.currentSize || ''} />
@@ -87,7 +123,7 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
           <Icon name="Code" />
         </MemoButton>
         <MemoButton tooltip="Code block" onClick={commands.onCodeBlock}>
-          <Icon name="Code2" />
+          <Icon name="CodeXml" />
         </MemoButton>
         <EditLinkPopover onSetLink={commands.onLink} />
         <Popover.Root>
@@ -125,7 +161,7 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
         <Popover.Root>
           <Popover.Trigger asChild>
             <MemoButton tooltip="More options">
-              <Icon name="MoreVertical" />
+              <Icon name="EllipsisVertical" />
             </MemoButton>
           </Popover.Trigger>
           <Popover.Content side="top" asChild>

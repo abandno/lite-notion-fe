@@ -19,6 +19,8 @@ import {find} from "@/utils";
 import {DndContext, DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 import './DocMenuTree.scss';
+import {Ellipsis} from "lucide-react";
+import {Icon} from "@components/ui/Icon.tsx";
 
 const DocMenuContext = React.createContext({
   selectedNode: null,
@@ -63,14 +65,16 @@ const NodeDropdown = ({node, path, onAddDoc, onDeleteDoc}) => {
     }
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.stopPropagation();
     console.log("Dropdown click")
   }
 
   return (
       <Dropdown menu={{items: dropdownItems, onClick: handleMenuClick}} trigger={['click']}>
         <Button type="text" style={style} onClick={handleClick} size="small">
-          <MoreIcon/>
+          {/*<MoreIcon/>*/}
+          <Icon name="Ellipsis"/>
         </Button>
       </Dropdown>
   )

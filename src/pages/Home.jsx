@@ -4,7 +4,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {Route, Routes} from 'react-router-dom';
 import {addDocument, deleteDocument, listDocument} from "@/api";
 import {removeIf, toQueryString} from "@/utils";
-import Editor from "@components/editor";
+import {Editor} from "@components/editor";
 import {useMount} from "ahooks";
 import DocMenuTree from "@/pages/DocMenuTree";
 
