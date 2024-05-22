@@ -21,6 +21,7 @@ import {HTML5Backend} from 'react-dnd-html5-backend'
 import './DocMenuTree.scss';
 import {Ellipsis} from "lucide-react";
 import {Icon} from "@components/ui/Icon.tsx";
+import {EditorContext} from "@/context";
 
 const DocMenuContext = React.createContext({
   selectedNode: null,
@@ -262,7 +263,7 @@ const MySpaceTitleLine = ({handleAddDoc}) => {
 
 
 export function DocMenuTree0({onSelectedChange}) {
-  const { token } = theme.useToken();
+  const {token} = theme.useToken();
   const panelStyle: React.CSSProperties = {
     marginBottom: 1,
     // background: token.colorFillAlter,
@@ -271,6 +272,12 @@ export function DocMenuTree0({onSelectedChange}) {
   };
   const [mySpaceTreeData, setMySpaceTreeData] = useState([]);
   const [knowledgeBaseTreeData, setKnowledgeBaseTreeData] = useState([]);
+
+  const {currentDocumentTitle} = useContext(EditorContext);
+  useEffect(() => {
+    console.log("currentDocumentTitle change", currentDocumentTitle)
+    refreshDocument();
+  }, [currentDocumentTitle])
 
   function refreshDocument() {
     listDocument({userId: 1}).then((res) => {

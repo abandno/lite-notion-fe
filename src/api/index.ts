@@ -15,3 +15,11 @@ export function listDocument(param) {
 export function moveNode(param) {
   return post('/api/document/moveNode', param);
 }
+
+export function updateDocInfo(param) {
+  return post('/api/document/updateDocInfo', param);
+}
+
+export function getDocInfo(param) {
+  return get('/api/document/getDocInfo', param);
+}

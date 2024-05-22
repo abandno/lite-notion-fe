@@ -1,5 +1,5 @@
 import {useLocation} from "react-router-dom";
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {EditorContent, useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
@@ -11,7 +11,7 @@ import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import * as Y from 'yjs'
 import {TiptapCollabProvider} from '@hocuspocus/provider'
 import {ClientId, getRandomElement} from "@/utils";
-import {useMount, useUnmount} from "ahooks";
+import {useDebounceFn, useMount, useUnmount} from "ahooks";
 import {ExtensionKit} from '@components/extensions/extension-kit'
 import "./index.scss"
 import '@/styles/editor/index.css'
@@ -21,6 +21,8 @@ import ImageBlockMenu from '@components/extensions/ImageBlock/components/ImageBl
 import {ColumnsMenu} from '@components/extensions/MultiColumn/menus'
 import {TableColumnMenu, TableRowMenu} from '@components/extensions/Table/menus'
 import useContentItemActions from "@components/menus/ContentItemMenu/hooks/useContentItemActions.tsx";
+import {EditorContext} from "@/context";
+import {getDocInfo, updateDocInfo} from "@/api";
 
 
 const colors = ['#958DF1', '#F98181', '#FBBC88', '#FAF594', '#70CFF8', '#94FADB', '#B9F18D']
@@ -51,22 +53,74 @@ const buildTiptapCollabProvider = (room, ydoc) => {
 const DocumentTitle = ({editor, id, title}) => {
   const [titleValue, setTitleValue] = useState(title);
   const actions = useContentItemActions(editor, null, 1)
+  const {setCurrentDocumentTitle} = useContext(EditorContext)
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const inputRef = useRef(null);
+
+  const { run: debounceUpdateDocInfo } = useDebounceFn(
+      (oldTitle) => {
+        // console.log("debounceUpdateDocInfo", oldTitle);
+        // 持久化新标题, 成功后, 通知上层, 否则, 回滚
+        updateDocInfo({id, title: titleValue}).then(() => {
+          // console.log("updateDocInfo success");
+          setCurrentDocumentTitle(titleValue)
+        }).catch(() => {
+          // console.log("updateDocInfo failed");
+          setTitleValue(oldTitle);
+        })
+      },
+      {
+        wait: 500,
+      },
+  );
+
+  // !! 不能 async , 会导致输入后光标蹦到行尾了
+  const handleChange = (e) => {
+    console.log("handleChange", e.target.value);
+    const oldTitle = titleValue;
+    const { value: newTitle, selectionStart } = e.target;
+    const cursorPosition = inputRef.current.selectionStart;
+    console.log('handleChange cursorPosition', cursorPosition);
+    // if (isComposing) {
+    //   return
+    // }
+    // 更新文档 title
+    // await updateDocInfo({id, title: newTitle})
+    setTitleValue(newTitle);
+    // 保存当前光标位置
+    // 在这里可以处理你的逻辑
+    // 设置光标位置
+    // setTimeout(() => {
+    //   inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+    // }, 200);
+
+    debounceUpdateDocInfo(oldTitle)
+  }
+  const [isComposing, setIsComposing] = useState(false);
 
   return (
       <div className="doc-title-zone caret-black dark:caret-white outline-0 pr-8 pl-20 py-4 z-0 lg:pl-8 lg:pr-8;">
         <div className="mx-auto max-w-2xl">
           <input type="text" className="text-3xl font-bold my-4 focus:outline-none bg-transparent"
+                 ref={inputRef}
                  value={titleValue}
                  placeholder="输入标题"
-                 onChange={(e) => {
-                   setTitleValue(e.target.value);
-                 }}
+                 onChange={handleChange}
+                 // onInput={handleChange}
                  onKeyDown={(e) => {
                    // console.log("keydown", e);
                    if (e.key === 'Enter' || e.keyCode === 13) {
                      e.preventDefault(); // 阻止默认的回车行为
                      actions.handleEnterFocus(1);
                    }
+                 }}
+                 onCompositionStart={() => {
+                   // console.log('onCompositionStart');
+                   setIsComposing(true)
+                 }}
+                 onCompositionEnd={() => {
+                   // console.log("onCompositionEnd");
+                   setIsComposing(false)
                  }}
           />
           <p className="text-sm space-x-4">
@@ -221,6 +275,7 @@ export const Editor = () => {
   const params = new URLSearchParams(search);
   const id = params.get("id");
   const title = params.get("title");
+  console.log("Editor title", title);
   useMount(() => {
     console.log("[Editor] editor mounted", id, title);
   })
