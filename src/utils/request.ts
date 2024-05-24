@@ -20,6 +20,7 @@ service.interceptors.response.use(
       if (res.code !== 0) {
         // 如果 code 不等于 0，说明有错误，弹窗提示 msg
         message.error(res.msg || DEFAULT_MSG);
+        console.log("response data code !== 0", response);
         return Promise.reject(new Error(`${res.code}:${res.msg}:${res.error}`));
       } else {
         // 如果 code 等于 0，说明成功，直接返回数据

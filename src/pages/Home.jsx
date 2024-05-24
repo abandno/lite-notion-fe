@@ -33,7 +33,8 @@ const Home = () => {
   // })
 
   const goEdit = (item) => {
-    navigate(`/edit/${item.id}?` + toQueryString(item));
+    // navigate(`/edit/${item.id}?` + toQueryString(item));
+    navigate(`/edit/${item.id}`);
   };
   const requestAddDocument = () => {
     console.log("requestAddDocument")

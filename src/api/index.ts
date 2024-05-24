@@ -21,5 +21,5 @@ export function updateDocInfo(param) {
 }
 
 export function getDocInfo(param) {
-  return get('/api/document/getDocInfo', param);
+  return get('/api/document/docInfo', param);
 }
