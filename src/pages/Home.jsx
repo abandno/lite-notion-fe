@@ -12,7 +12,7 @@ import {EditorContextProvider} from "@/context";
 const {Header, Content, Footer, Sider} = Layout;
 const {Title} = Typography;
 
-const Home = () => {
+export const Home = () => {
   const navigate = useNavigate();
 
   const [data, setData] = useState([
