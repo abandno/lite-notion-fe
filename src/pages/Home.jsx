@@ -102,10 +102,10 @@ export const Home = () => {
               <Breadcrumb.Item>App</Breadcrumb.Item>
             </Breadcrumb>
             <div>
-              <Routes>
+              {/* <Routes>
                 <Route path="/" element={<ArticleList data={data} goEdit={goEdit}/>}/>
                 <Route path="/edit/:id" element={<Editor />}/>
-              </Routes>
+              </Routes> */}
               {/*<List
               style={{ width: '45%' }}
               header={<Title level={3}>Article List</Title>}

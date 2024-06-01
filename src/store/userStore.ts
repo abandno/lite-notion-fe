@@ -55,22 +55,35 @@ export const useSignIn = () => {
   const { notification, message } = App.useApp();
   const { setUserToken, setUserInfo } = useUserActions();
 
-  const signInMutation = useMutation(userService.signin);
+  // const signInMutation = useMutation(userService.signin);
+  // const signInMutation = useMutation((data: SignInReq) => {
+  //   console.log("======> signInMutation", data);
+  //   return new Promise((resolve, reject) => {
+
+  //   });
+  // });
+  // 假设 userService.signin 的定义如下:
+  // async function signin(data: SignInReq): Promise<any> { ... } // 注意：将 AxiosResponse 替换为任何期望的响应类型
+
+  const signInMutation = useMutation({
+    mutationFn: userService.signin
+  });
 
   const signIn = async (data: SignInReq) => {
     try {
       const res = await signInMutation.mutateAsync(data);
-      const { user, accessToken, refreshToken } = res;
+      const { user, accessToken, refreshToken } = res.data;
       setUserToken({ accessToken, refreshToken });
       setUserInfo(user);
       navigatge(HOMEPAGE, { replace: true });
 
       notification.success({
         message: t('sys.login.loginSuccessTitle'),
-        description: `${t('sys.login.loginSuccessDesc')}: ${data.username}`,
+        description: `${t('sys.login.loginSuccessDesc')}: ${user.nickname}`,
         duration: 3,
       });
     } catch (err) {
+      console.error(err);
       message.warning({
         content: err.message,
         duration: 3,

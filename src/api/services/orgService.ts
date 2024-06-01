@@ -1,12 +1,11 @@
-import apiClient from '../apiClient';
 
-import { Organization } from '#/entity';
+import { get } from '@/utils/request';
 
 export enum OrgApi {
-  Org = '/org',
+  Org = '/api/org',
 }
 
-const getOrgList = () => apiClient.get<Organization[]>({ url: OrgApi.Org });
+const getOrgList = () => get(OrgApi.Org, null);
 
 export default {
   getOrgList,
