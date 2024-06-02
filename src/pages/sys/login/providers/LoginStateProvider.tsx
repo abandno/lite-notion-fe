@@ -3,6 +3,7 @@ import { PropsWithChildren, createContext, useContext, useMemo, useState } from 
 export enum LoginStateEnum {
   LOGIN,
   REGISTER,
+  // 忘记密码, 重置密码
   RESET_PASSWORD,
   MOBILE,
   QR_CODE,
