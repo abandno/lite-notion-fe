@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 const { Countdown } = Statistic;
 
-export const SmsCodeFormItemContent = () => {
+export const SmsCodeFormItemContent = ({onStart=undefined, onChange=undefined, ...rest}) => {
   const { t } = useTranslation();
   const onFinish = (values: any) => {
     console.log("Received values of form: ", values);
@@ -13,13 +13,13 @@ export const SmsCodeFormItemContent = () => {
   const [second, setSecond] = useState(0);
 
   const start = () => {
+    // 发送验证码请求
+    onStart && onStart();
     setCountdown(60);
     setSecond(60);
   };
 
   const reset = () => {
-    // TODO: 发送验证码请求
-
     // 启动倒计时
     setCountdown(0);
     setSecond(60);
@@ -28,7 +28,10 @@ export const SmsCodeFormItemContent = () => {
   return (
     <Row justify="space-between">
       <Col span={14}>
-        <Input placeholder={t("sys.login.smsCode")} />
+        <Input
+          placeholder={t("sys.login.smsCode")}
+          onChange={(e) => onChange && onChange(e.target.value)}
+        />
       </Col>
       <Col span={9} flex={1}>
         <Button

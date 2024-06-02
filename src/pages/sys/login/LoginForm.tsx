@@ -1,20 +1,16 @@
-import { Alert, Button, Checkbox, Col, Divider, Form, Input, Row } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AiFillGithub, AiFillGoogleCircle, AiFillWechat } from 'react-icons/ai';
-
-import { DEFAULT_USER, TEST_USER } from '@/_mock/assets';
-import { SignInReq } from '@/api/services/userService';
-import { useSignIn } from '@/store/userStore';
-import ProTag from '@/theme/antd/components/tag';
-import { useThemeToken } from '@/theme/hooks';
-
+import userService from '@/api/services/userService';
 import { LoginStateEnum, useLoginStateContext } from './providers/LoginStateProvider';
 import { Tabs, Statistic } from "antd";
 const { Countdown } = Statistic;
-
 import styled from "styled-components";
-import { ButtonType } from 'antd/es/button';
+import { SmsCodeFormItemContent } from './components/SmsCode';
+import { useNavigate } from "react-router-dom";
+import { useUserActions } from '@/store/userStore';
+const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
+import { message, notification } from "antd"; 
 
 const StyledButton = styled(Button)`
   &:hover {
@@ -25,6 +21,7 @@ const StyledButton = styled(Button)`
 
 const IButton = ({children, type = "text", size = "default", ...rest}) => {
   return (
+    // @ts-ignore
     <StyledButton type={type} size={size} {...rest}>
       {children}
     </StyledButton>
@@ -33,25 +30,45 @@ const IButton = ({children, type = "text", size = "default", ...rest}) => {
 
 const PhoneLoginForm = () => {
   const { t } = useTranslation();
-  const [countdown, setCountdown] = useState(0); // 倒计时的秒数
-  const [second, setSecond] = useState(0);
-  const start = () => {
-    // TODO: 发送验证码请求
-    setCountdown(60);
-    setSecond(60);
-  };
-  const reset = () => {
-    // 启动倒计时
-    setCountdown(0);
-    setSecond(60);
+  const navigatge = useNavigate();
+  const { setUserToken, setUserInfo } = useUserActions();
+
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
+  const handleSendVcode = () => {
+    const p = form.getFieldValue("phone");
+    console.log("sendVerifyCode", p);
+    userService.sendVerifyCode(p);
+  }
+
+  const handleFinish = async (values) => {
+    console.log("PhoneLoginForm handleFinish", values);
+    setLoading(true);
+    try {
+      const res = await userService.codeSignIn(values);
+      const { user, accessToken, refreshToken } = res?.data;
+      setUserToken({ accessToken, refreshToken });
+      setUserInfo(user);
+      navigatge(HOMEPAGE, { replace: true });
+
+      notification.success({
+        message: t("sys.login.loginSuccessTitle"),
+        description: `${t("sys.login.loginSuccessDesc")}: ${user.nickname}`,
+        duration: 3,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <Form
+        form={form}
         name="login"
         size="large"
-        // onFinish={handleFinish}
+        onFinish={handleFinish}
       >
         <Form.Item
           name="phone"
@@ -59,7 +76,7 @@ const PhoneLoginForm = () => {
             { required: true, message: t("sys.login.mobilePlaceholder") },
           ]}
         >
-          <Input placeholder={t("sys.login.mobilePlaceholder")} />
+          <Input placeholder={t("sys.login.mobile")} />
         </Form.Item>
         <Form.Item
           name="code"
@@ -67,7 +84,14 @@ const PhoneLoginForm = () => {
             { required: true, message: t("sys.login.smsCodePlaceholder") },
           ]}
         >
-          <Row justify="space-between">
+          {/* <Col span={14}>
+            <Input placeholder={t("sys.login.smsCode")} />
+          </Col> */}
+          <SmsCodeFormItemContent
+            onStart={handleSendVcode}
+            onChange={(value) => form.setFieldsValue({ code: value })}
+          />
+          {/* <Row justify="space-between">
             <Col span={14}>
               <Input placeholder={t("sys.login.smsCode")} />
             </Col>
@@ -98,7 +122,7 @@ const PhoneLoginForm = () => {
                 )}
               </Button>
             </Col>
-          </Row>
+          </Row> */}
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" className="w-full">
@@ -113,7 +137,7 @@ const PhoneLoginForm = () => {
 
 const PasswordLoginForm = () => {
   const { t } = useTranslation();
-  const { loginState, setLoginState } = useLoginStateContext();
+  const { setLoginState } = useLoginStateContext();
 
  
   return (
@@ -160,22 +184,12 @@ const PasswordLoginForm = () => {
 
 function LoginForm() {
   const { t } = useTranslation();
-  const themeToken = useThemeToken();
   const [loading, setLoading] = useState(false);
 
-  const { loginState, setLoginState } = useLoginStateContext();
-  const signIn = useSignIn();
+  const { loginState } = useLoginStateContext();
 
   if (loginState !== LoginStateEnum.LOGIN) return null;
 
-  const handleFinish = async ({ username, password }: SignInReq) => {
-    setLoading(true);
-    try {
-      await signIn({ username, password });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const tabItems = [
     {
