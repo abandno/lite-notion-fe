@@ -10,7 +10,9 @@ import { SmsCodeFormItemContent } from './components/SmsCode';
 import { useNavigate } from "react-router-dom";
 import { useUserActions } from '@/store/userStore';
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
-import { message, notification } from "antd"; 
+import { message, notification } from "antd";
+import * as CryptoJS from 'crypto-js';
+import {hashPassword} from "@/utils";
 
 const StyledButton = styled(Button)`
   &:hover {
@@ -39,7 +41,7 @@ const PhoneLoginForm = () => {
   const handleSendVcode = () => {
     const p = form.getFieldValue("phone");
     console.log("sendVerifyCode", p);
-    userService.sendVerifyCode(p);
+    userService.sendVerifyCode({phone: p, type: "PhoneLogin"});
   }
 
   const handleFinish = async (values) => {
@@ -84,48 +86,13 @@ const PhoneLoginForm = () => {
             { required: true, message: t("sys.login.smsCodePlaceholder") },
           ]}
         >
-          {/* <Col span={14}>
-            <Input placeholder={t("sys.login.smsCode")} />
-          </Col> */}
           <SmsCodeFormItemContent
             onStart={handleSendVcode}
             onChange={(value) => form.setFieldsValue({ code: value })}
           />
-          {/* <Row justify="space-between">
-            <Col span={14}>
-              <Input placeholder={t("sys.login.smsCode")} />
-            </Col>
-            <Col span={9} flex={1}>
-              <Button
-                disabled={countdown !== 0}
-                className="w-full !text-sm"
-                onClick={start}
-              >
-                {countdown === 0 ? (
-                  <span>{t("sys.login.sendSmsButton")}</span>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <Countdown
-                      className="hidden"
-                      value={Date.now() + countdown * 1000}
-                      onChange={(time) => {
-                        setCountdown(Number(time) / 1000);
-                        setSecond(Math.floor(Number(time) / 1000));
-                      }}
-                      format="ss"
-                      onFinish={reset}
-                    />
-                    <span className="ml-1">
-                      {t("sys.login.sendSmsText", { second })}
-                    </span>
-                  </div>
-                )}
-              </Button>
-            </Col>
-          </Row> */}
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="w-full">
+          <Button type="primary" htmlType="submit" className="w-full" loading={loading}>
             {t("sys.login.loginButton")}
           </Button>
         </Form.Item>
@@ -138,14 +105,40 @@ const PhoneLoginForm = () => {
 const PasswordLoginForm = () => {
   const { t } = useTranslation();
   const { setLoginState } = useLoginStateContext();
+  const navigatge = useNavigate();
+  const { setUserToken, setUserInfo } = useUserActions();
 
- 
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
+  const handleFinish = async (values) => {
+    console.log("[PasswordLoginForm] handleFinish", values);
+    setLoading(true);
+    const {username, password} = values;
+    try {
+      const passwordHash = hashPassword(password, username)
+      const res = await userService.passwordSignIn({username, password: passwordHash});
+      const { user, accessToken, refreshToken } = res?.data;
+      setUserToken({ accessToken, refreshToken });
+      setUserInfo(user);
+      navigatge(HOMEPAGE, { replace: true });
+
+      notification.success({
+        message: t("sys.login.loginSuccessTitle"),
+        description: `${t("sys.login.loginSuccessDesc")}: ${user.nickname}`,
+        duration: 3,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Form
         name="login"
         size="large"
-        // onFinish={handleFinish}
+        onFinish={handleFinish}
       >
         <Form.Item
           name="username"
@@ -173,7 +166,7 @@ const PasswordLoginForm = () => {
           />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="w-full">
+          <Button type="primary" htmlType="submit" className="w-full" loading={loading}>
             {t("sys.login.loginButton")}
           </Button>
         </Form.Item>

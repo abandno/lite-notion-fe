@@ -1,5 +1,13 @@
 import { BasicStatus, PermissionType } from './enum';
 
+export interface Ret {
+  requestId:string;
+  code: number;
+  msg: string;
+  data?: any;
+  error?: string;
+}
+
 export interface UserToken {
   accessToken?: string;
   refreshToken?: string;
@@ -7,8 +15,9 @@ export interface UserToken {
 
 export interface UserInfo {
   id: string;
-  email: string;
-  username: string;
+  email?: string;
+  username?: string;
+  nickname?: string;
   password?: string;
   avatar?: string;
   role?: Role;

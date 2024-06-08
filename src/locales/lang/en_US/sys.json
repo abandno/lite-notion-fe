@@ -72,7 +72,8 @@
       "registerAndAgree": "By signing up, I agree to",
       "termsOfService": " Terms of service ",
       "privacyPolicy": " Privacy policy ",
-      "logout": "Logout"
+      "logout": "Logout",
+      "resetPasswordSuccess": "Reset password success"
     },
     "tab": {
       "fullscreen": "FullScreen",

@@ -1,3 +1,5 @@
+import * as CryptoJS from 'crypto-js';
+
 export * from "./RandomUtil"
 export * from "./DeviceId"
 
@@ -39,4 +41,10 @@ export function find(arr, fn) {
     }
   }
   return null;
+}
+
+export function hashPassword(password, salt) {
+  let passwordHash = CryptoJS.SHA256(`${salt}${password}${salt}`);
+  // 返回哈希值的十六进制字符串表示
+  return passwordHash.toString(CryptoJS.enc.Base64);
 }

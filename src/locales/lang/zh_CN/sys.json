@@ -71,7 +71,8 @@
       "registerAndAgree": "注册即我同意",
       "termsOfService": " 服务条款 ",
       "privacyPolicy": " 隐私政策 ",
-      "logout": "退出"
+      "logout": "退出",
+      "resetPasswordSuccess": "重置密码成功"
     },
     "tab": {
       "fullscreen": "内容全屏",

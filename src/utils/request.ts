@@ -1,5 +1,6 @@
 import axios from 'axios';
-import {message} from 'antd'; // 假设你使用的是 antd 的 message 组件来显示提示信息
+import {message} from 'antd';
+import {Ret} from "#/entity.ts"; // 假设你使用的是 antd 的 message 组件来显示提示信息
 
 // console.log("import.meta.env.VITE_API_URL", import.meta.env.VITE_API_URL);
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
@@ -41,12 +42,12 @@ export const post = (url, data) => {
     url,
     method: "post",
     data,
-  })
+  }) as Promise<Ret>
 }
 export const get = (url, params) => {
   return service({
     url,
     method: "get",
     params,
-  })
+  }) as Promise<Ret>
 }

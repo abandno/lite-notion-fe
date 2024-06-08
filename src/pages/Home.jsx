@@ -7,12 +7,16 @@ import {removeIf, toQueryString} from "@/utils";
 import {Editor} from "@components/editor";
 import {useMount} from "ahooks";
 import DocMenuTree from "@/pages/DocMenuTree";
-import {EditorContextProvider} from "@/context";
+import { EditorContextProvider } from "@/context";
+import Header from '@/layouts/header';
+import { useSettings } from '@/store/settingStore';
+import { ThemeLayout, ThemeMode } from '#/enum';
 
-const {Header, Content, Footer, Sider} = Layout;
+const {Content, Footer, Sider} = Layout;
 const {Title} = Typography;
 
 export const Home = () => {
+  const { themeLayout, themeMode } = useSettings();
   const navigate = useNavigate();
 
   const [data, setData] = useState([
@@ -92,9 +96,7 @@ export const Home = () => {
           <DocMenuTree onSelectedChange={goEdit} />
         </Sider>
         <Layout>
-          <Header>
-            搜索栏\个人头像
-          </Header>
+          <Header />
           <Content style={{ padding: '0 50px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>Home</Breadcrumb.Item>

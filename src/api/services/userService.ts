@@ -19,13 +19,15 @@ export enum UserApi {
   User = '/api/user',
   SendVerifyCode = '/api/user/auth/sendVerifyCode',
   CodeSignIn = '/api/user/auth/codeSignIn',
+  PasswordSignIn = '/api/user/auth/passwordSignIn',
+  ResetPassword = '/api/user/auth/resetPassword',
 }
 
 const signin = (data: SignInReq) => post(UserApi.SignIn, data);
 const signup = (data: SignUpReq) => post(UserApi.SignUp, data);
 const logout = () => get(UserApi.Logout, {});
 const findById = (id: string) => get(`${UserApi.User}/${id}`, {});
-const sendVerifyCode = (phone) => post(UserApi.SendVerifyCode, {phone})
+const sendVerifyCode = (param) => post(UserApi.SendVerifyCode, param)
 
 export default {
   signin,
@@ -33,5 +35,7 @@ export default {
   findById,
   logout,
   sendVerifyCode,
-  codeSignIn: ({ phone, code }) => post(UserApi.CodeSignIn, { phone, code })
+  codeSignIn: (param) => post(UserApi.CodeSignIn, param),
+  passwordSignIn: (param) => post(UserApi.PasswordSignIn, param),
+  resetPassword: (param) => post(UserApi.ResetPassword, param),
 };
