@@ -72,7 +72,8 @@
       "termsOfService": " 服务条款 ",
       "privacyPolicy": " 隐私政策 ",
       "logout": "退出",
-      "resetPasswordSuccess": "重置密码成功"
+      "resetPasswordSuccess": "重置密码成功",
+      "passwordFormatHint": "密码长度不低于6位"
     },
     "tab": {
       "fullscreen": "内容全屏",

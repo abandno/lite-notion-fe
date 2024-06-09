@@ -12,9 +12,12 @@ export const SmsCodeFormItemContent = ({onStart=undefined, onChange=undefined, .
   const [countdown, setCountdown] = useState(0); // 倒计时的秒数
   const [second, setSecond] = useState(0);
 
-  const start = () => {
+  const start = async () => {
     // 发送验证码请求
-    onStart && onStart();
+    const sendOk = onStart && await onStart();
+    if (!sendOk) {
+      return
+    }
     setCountdown(60);
     setSecond(60);
   };

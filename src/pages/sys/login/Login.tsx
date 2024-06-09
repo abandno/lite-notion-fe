@@ -3,7 +3,9 @@ import Color from 'color';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
 
+// @ts-ignore
 import DashboardImg from '@/assets/images/background/dashboard.png';
+// @ts-ignore
 import Overlay2 from '@/assets/images/background/overlay_2.jpg';
 import LocalePicker from '@/components/locale-picker';
 import { useUserToken } from '@/store/userStore';
@@ -15,7 +17,7 @@ import { LoginStateProvider } from './providers/LoginStateProvider';
 import QrCodeFrom from './QrCodeForm';
 import RegisterForm from './RegisterForm';
 import ResetForm from './ResetForm';
-
+// @ts-ignore
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
 function Login() {

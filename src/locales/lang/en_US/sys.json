@@ -73,7 +73,8 @@
       "termsOfService": " Terms of service ",
       "privacyPolicy": " Privacy policy ",
       "logout": "Logout",
-      "resetPasswordSuccess": "Reset password success"
+      "resetPasswordSuccess": "Reset password success",
+      "passwordFormatHint": "The password must be at least 6 characters long"
     },
     "tab": {
       "fullscreen": "FullScreen",

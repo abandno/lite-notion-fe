@@ -1,7 +1,8 @@
 import { PropsWithChildren, createContext, useContext, useMemo, useState } from 'react';
 
 export enum LoginStateEnum {
-  LOGIN,
+  CODE_LOGIN,
+  PASSWORD_LOGIN,
   REGISTER,
   // 忘记密码, 重置密码
   RESET_PASSWORD,
@@ -15,7 +16,7 @@ interface LoginStateContextType {
   backToLogin: () => void;
 }
 const LoginStateContext = createContext<LoginStateContextType>({
-  loginState: LoginStateEnum.LOGIN,
+  loginState: LoginStateEnum.CODE_LOGIN,
   setLoginState: () => {},
   backToLogin: () => {},
 });
@@ -26,10 +27,10 @@ export function useLoginStateContext() {
 }
 
 export function LoginStateProvider({ children }: PropsWithChildren) {
-  const [loginState, setLoginState] = useState(LoginStateEnum.LOGIN);
+  const [loginState, setLoginState] = useState(LoginStateEnum.CODE_LOGIN);
 
   function backToLogin() {
-    setLoginState(LoginStateEnum.LOGIN);
+    setLoginState(LoginStateEnum.CODE_LOGIN);
   }
 
   const value: LoginStateContextType = useMemo(

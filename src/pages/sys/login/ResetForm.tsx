@@ -1,13 +1,13 @@
 import {Button, Form, Input, notification} from 'antd';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
-import { SvgIcon } from '@/components/icon';
+import {SvgIcon} from '@/components/icon';
 
-import { ReturnButton } from './components/ReturnButton';
-import { LoginStateEnum, useLoginStateContext } from './providers/LoginStateProvider';
-import { SmsCodeFormItemContent } from './components/SmsCode';
+import {ReturnButton} from './components/ReturnButton';
+import {LoginStateEnum, useLoginStateContext} from './providers/LoginStateProvider';
+import {SmsCodeFormItemContent} from './components/SmsCode';
 import userService from "@/api/services/userService.ts";
-import {useUserInfo, useUserToken} from "@/store/userStore.ts";
+import {useUserInfo} from "@/store/userStore.ts";
 import {useState} from "react";
 import {hashPassword} from "@/utils";
 
@@ -15,15 +15,14 @@ function ResetForm() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const userInfo = useUserInfo();
+  const { loginState, setLoginState, backToLogin } = useLoginStateContext();
 
   const onFinish = async (values: any) => {
     console.log('[ResetForm] Received values of form: ', values);
-    const { backToLogin } = useLoginStateContext();
     setLoading(true);
 
     try {
       const res = await userService.resetPassword({
-        userId: userInfo.id,
         phone: values.phone,
         password: hashPassword(values.password, values.phone),
         code: values.code
@@ -34,21 +33,24 @@ function ResetForm() {
       });
 
       // 回到登录Form
-      backToLogin();
+      setLoginState(LoginStateEnum.PASSWORD_LOGIN);
     } finally {
       setLoading(false)
     }
   };
 
   const { t } = useTranslation();
-  const { loginState, backToLogin } = useLoginStateContext();
 
   if (loginState !== LoginStateEnum.RESET_PASSWORD) return null;
 
-  const handleSendVcode = () => {
+  const handleSendVcode = async () => {
     const p = form.getFieldValue("phone");
     console.log("ResetForm sendVerifyCode", p);
-    userService.sendVerifyCode({phone: p, type: "ResetPassword"});
+    if (!p) {
+      return false;
+    }
+    await userService.sendVerifyCode({phone: p, type: "ResetPassword"});
+    return true;
   }
 
   return (
@@ -60,6 +62,7 @@ function ResetForm() {
         {t("sys.login.forgetFormTitle")}
       </div>
       <Form
+        form={form}
         name="normal_login"
         size="large"
         initialValues={{ remember: true }}
@@ -80,6 +83,7 @@ function ResetForm() {
           name="password"
           rules={[
             { required: true, message: t("sys.login.passwordPlaceholder") },
+            { min: 6, message: t("sys.login.passwordFormatHint") },
           ]}
         >
           <Input placeholder={t("sys.login.password")} />

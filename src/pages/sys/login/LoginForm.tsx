@@ -1,18 +1,16 @@
-import { Button, Form, Input } from 'antd';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import {Button, Form, Input, notification, Statistic, Tabs} from 'antd';
+import {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import userService from '@/api/services/userService';
-import { LoginStateEnum, useLoginStateContext } from './providers/LoginStateProvider';
-import { Tabs, Statistic } from "antd";
-const { Countdown } = Statistic;
+import {LoginStateEnum, useLoginStateContext} from './providers/LoginStateProvider';
 import styled from "styled-components";
-import { SmsCodeFormItemContent } from './components/SmsCode';
-import { useNavigate } from "react-router-dom";
-import { useUserActions } from '@/store/userStore';
-const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
-import { message, notification } from "antd";
-import * as CryptoJS from 'crypto-js';
+import {SmsCodeFormItemContent} from './components/SmsCode';
+import {useNavigate} from "react-router-dom";
+import {useUserActions} from '@/store/userStore';
 import {hashPassword} from "@/utils";
+
+// @ts-ignore
+const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
 const StyledButton = styled(Button)`
   &:hover {
@@ -38,10 +36,14 @@ const PhoneLoginForm = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  const handleSendVcode = () => {
+  const handleSendVcode = async () => {
     const p = form.getFieldValue("phone");
     console.log("sendVerifyCode", p);
-    userService.sendVerifyCode({phone: p, type: "PhoneLogin"});
+    if (!p) {
+      return false;
+    }
+    await userService.sendVerifyCode({phone: p, type: "PhoneLogin"});
+    return true;
   }
 
   const handleFinish = async (values) => {
@@ -181,7 +183,8 @@ function LoginForm() {
 
   const { loginState } = useLoginStateContext();
 
-  if (loginState !== LoginStateEnum.LOGIN) return null;
+  // if (loginState !== LoginStateEnum.LOGIN) return null;
+  if ([LoginStateEnum.CODE_LOGIN, LoginStateEnum.PASSWORD_LOGIN].includes(loginState) == false) return null
 
 
   const tabItems = [
@@ -196,13 +199,14 @@ function LoginForm() {
       children: <PasswordLoginForm />,
     },
   ];
+  const defaultActiveKey = loginState == LoginStateEnum.CODE_LOGIN ? "PhoneLoginForm" : "PasswordLoginForm"
 
   return (
     <>
       <div className="mb-8 text-2xl font-bold xl:text-3xl">
         {t("sys.login.signInFormTitle")}
       </div>
-      <Tabs type="card" items={tabItems} />
+      <Tabs type="card" items={tabItems} defaultActiveKey={defaultActiveKey} />
     </>
   );
 }

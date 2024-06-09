@@ -10,7 +10,7 @@ import { getItem, removeItem, setItem } from '@/utils/storage';
 
 import { UserInfo, UserToken } from '@/types/entity';
 import { StorageEnum } from '@/types/enum';
-
+// @ts-ignore
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
 type UserStore = {
