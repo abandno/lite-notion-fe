@@ -359,14 +359,15 @@ export function DocMenuTree0({onSelectedChange}) {
                       label: '共享空间',
                       style: panelStyle,
                       children: <SortableTreeCard />
-                    },*/ {
+                    },*/ /*{
               key: '3',
               label: '知识库',
               style: panelStyle,
               children: <SortableTreeCard treeData={knowledgeBaseTreeData}
                                           updateTreeData={setKnowledgeBaseTreeData}
               />
-            }]}
+            }*/
+            ]}
           />
       </DndProvider>
   )

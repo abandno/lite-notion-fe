@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import {Layout, Breadcrumb, List, Typography, Button} from 'antd';
-import {useNavigate, useParams} from "react-router-dom";
+import {Outlet, useNavigate, useParams} from "react-router-dom";
 import {Route, Routes} from 'react-router-dom';
 import {addDocument, deleteDocument, listDocument} from "@/api";
 import {removeIf, toQueryString} from "@/utils";
 import {Editor} from "@components/editor";
 import {useMount} from "ahooks";
-import DocMenuTree from "@/pages/DocMenuTree";
+import DocMenuTree from "@/pages/doc/DocMenuTree";
 import { EditorContextProvider } from "@/context";
 import Header from '@/layouts/header';
 import { useSettings } from '@/store/settingStore';
@@ -15,7 +15,7 @@ import { ThemeLayout, ThemeMode } from '#/enum';
 const {Content, Footer, Sider} = Layout;
 const {Title} = Typography;
 
-export const Home = () => {
+export const Doc = () => {
   const { themeLayout, themeMode } = useSettings();
   const navigate = useNavigate();
 
@@ -36,9 +36,12 @@ export const Home = () => {
   //   })
   // })
 
+  // const [docId, setDocId] = useState(null);
+
   const goEdit = (item) => {
     // navigate(`/edit/${item.id}?` + toQueryString(item));
-    navigate(`/edit/${item.id}`);
+    navigate(`/doc/edit?id=${item.id}`);
+    // setDocId(item.id)
   };
   const requestAddDocument = () => {
     console.log("requestAddDocument")
@@ -104,10 +107,14 @@ export const Home = () => {
               <Breadcrumb.Item>App</Breadcrumb.Item>
             </Breadcrumb>
             <div>
+              <Outlet />
               {/* <Routes>
                 <Route path="/" element={<ArticleList data={data} goEdit={goEdit}/>}/>
                 <Route path="/edit/:id" element={<Editor />}/>
               </Routes> */}
+              {
+                // docId && <Editor id={docId} />
+              }
               {/*<List
               style={{ width: '45%' }}
               header={<Title level={3}>Article List</Title>}
@@ -131,4 +138,4 @@ export const Home = () => {
   );
 };
 
-export default Home;
+export default Doc;

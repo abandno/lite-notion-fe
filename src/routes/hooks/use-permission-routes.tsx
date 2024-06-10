@@ -1,11 +1,22 @@
 import { useMemo } from 'react';
 import { About } from '@/pages/About';
-import { SimpleLayout } from '@/layouts';
+import {Doc} from "@/pages/doc/Doc"
+import {Editor} from "@components/editor";
+
 
 // 路由配置对象
 const routeConfig = [
-  { path: "/home", element: <SimpleLayout /> },
-  { path: "/about", element: <About /> },
+  { path: "about", element: <About /> },
+  {
+    path: "doc",
+    element: <Doc />,
+    children: [
+      {
+        path: 'edit',
+        element: <Editor />,
+      },
+    ]
+  },
 ];
 
 /**

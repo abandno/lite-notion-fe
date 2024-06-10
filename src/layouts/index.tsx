@@ -2,12 +2,14 @@ import { useSettings } from "@/store/settingStore";
 import { ThemeMode } from "@/types/enum";
 import styled from "styled-components";
 import {Home} from "@/pages/Home"
+import {Outlet} from "react-router-dom";
 
 export const SimpleLayout = () => {
   const { themeLayout, themeMode } = useSettings();
   return (
     <StyleWrapper $themeMode={themeMode}>
-      <Home />
+      {/*<Home />*/}
+      <Outlet />
     </StyleWrapper>
   );
 };

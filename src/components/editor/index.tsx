@@ -304,14 +304,13 @@ const EditorInner = ({ id, title, ydoc, provider }) => {
 };
 
 export const Editor = () => {
-  const { id } = useParams();
-  // const { search } = useLocation();
-  // const params = new URLSearchParams(search);
-  // const id = params.get("id");
+  // const { id } = useParams();
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const id = params.get("id");
 
   // const title = params.get("title");
-  const { currentDocumentTitle, setCurrentDocumentTitle } =
-    useContext(EditorContext);
+  const { currentDocumentTitle, setCurrentDocumentTitle } = useContext(EditorContext);
   useEffect(() => {
     console.log("getDocInfo", id);
     getDocInfo({ id }).then((res) => {
