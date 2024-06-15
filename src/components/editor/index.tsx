@@ -33,6 +33,9 @@ import useContentItemActions from "@components/menus/ContentItemMenu/hooks/useCo
 import { EditorContext } from "@/context";
 import { getDocInfo, updateDocInfo } from "@/api";
 import { useLinkState } from "@/hooks";
+import {useCurrentDocNode, useDocTreeStore, useTreeData} from "@/store/docTreeStore.ts";
+import {changeNodeAtPath, findByKey, getNodeKeyFn} from "@/utils/tree-data-utils.ts";
+import {Tooltip} from "antd";
 
 const colors = [
   "#958DF1",
@@ -69,33 +72,57 @@ const buildTiptapCollabProvider = (room, ydoc) => {
   });
 };
 
-const DocumentTitle = ({ editor, id, title }) => {
+const DocumentTitle = ({ editor }) => {
+  const {currentDocNode, setCurrentDocNode} = useCurrentDocNode();
   const actions = useContentItemActions(editor, null, 1);
-  const { currentDocumentTitle, setCurrentDocumentTitle } =
-    useContext(EditorContext);
-  // const [titleValue, setTitleValue] = useState(currentDocumentTitle);
+  // const {itemMap} = useDocTreeStore();
+  // const currentNode = itemMap[id] || {}
+  // const {render} = useDocTreeStore(state => state.actions)
+  // const { currentDocumentTitle, setCurrentDocumentTitle } =
+  //   useContext(EditorContext);
+  const [titleValue, setTitleValue] = useState(currentDocNode.titleText);
   // // 使用 useEffect 来监听 currentDocumentTitle 的变化
   // useEffect(() => {
   //   // 当 currentDocumentTitle 变化时，更新 titleValue
   //   setTitleValue(currentDocumentTitle);
   // }, [currentDocumentTitle]); // 注意这里的依赖数组包含了 currentDocumentTitle
-  const [titleValue, setTitleValue] = useLinkState(currentDocumentTitle);
+  // const [titleValue, setTitleValue] = useLinkState(currentDocumentTitle);
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const inputRef = useRef(null);
+  const {treeData, setTreeData} = useTreeData(currentDocNode.root)
 
   const { run: debounceUpdateDocInfo } = useDebounceFn(
-    (oldTitle) => {
+    (newTitle, oldTitle) => {
       // console.log("debounceUpdateDocInfo", oldTitle);
       // 持久化新标题, 成功后, 通知上层, 否则, 回滚
-      updateDocInfo({ id, title: titleValue })
+      updateDocInfo({ id: currentDocNode.id, title: newTitle })
         .then(() => {
           // console.log("updateDocInfo success");
-          setCurrentDocumentTitle(titleValue);
+          // setCurrentDocumentTitle(titleValue);
+          // currentNode.title = newTitle;
+          // setItemMap(itemMap)
+          // render();
+          console.log('updateDocInfo before', treeData)
+          const treeDataN = changeNodeAtPath({
+            treeData,
+            path: currentDocNode.path.slice(1), // space id 去掉
+            ignoreCollapsed: false,
+            newNode: ({node, treeIndex}) => ({
+              ...node,
+              titleText: newTitle,
+              title: (<Tooltip key={currentDocNode.id} title={currentDocNode.id}>{newTitle}</Tooltip>)
+            })
+          })
+          console.log('updateDocInfo after', treeDataN)
+          setTreeData(treeDataN)
         })
-        .catch(() => {
-          // console.log("updateDocInfo failed");
+        .catch((e) => {
+          console.log("updateDocInfo failed", e);
           setTitleValue(oldTitle);
+          // currentNode.title = oldTitle;
+          // setItemMap(itemMap)
+          // render();
         });
     },
     {
@@ -123,7 +150,7 @@ const DocumentTitle = ({ editor, id, title }) => {
     //   inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
     // }, 200);
 
-    debounceUpdateDocInfo(oldTitle);
+    debounceUpdateDocInfo(newTitle, oldTitle);
   };
   const [isComposing, setIsComposing] = useState(false);
 
@@ -135,6 +162,7 @@ const DocumentTitle = ({ editor, id, title }) => {
           className="text-3xl font-bold my-4 focus:outline-none bg-transparent"
           ref={inputRef}
           value={titleValue}
+          // defaultValue={currentDocNode.title}
           placeholder="输入标题"
           onChange={handleChange}
           // onInput={handleChange}
@@ -155,8 +183,8 @@ const DocumentTitle = ({ editor, id, title }) => {
           }}
         />
         <p className="text-sm space-x-4">
-          <span>张飞</span>
-          <span>2024年5月17日 23:41:05</span>
+          <span>{currentDocNode.updatedBy}</span>
+          <span>{currentDocNode.updatedAt}</span>
         </p>
       </div>
     </div>
@@ -278,7 +306,7 @@ const EditorInner = ({ id, title, ydoc, provider }) => {
     <div className="editor flex flex-col" ref={menuContainerRef}>
       {/*{editor && <MenuBar editor={editor} />}*/}
       <div className="relative flex flex-col flex-1 overflow-hidden">
-        <DocumentTitle editor={editor} id={id} title={title} />
+        <DocumentTitle editor={editor} />
         {/*className="editor__content"*/}
         <EditorContent editor={editor} className="flex-1 overflow-y-auto" />
         <ContentItemMenu editor={editor} />
@@ -308,18 +336,28 @@ export const Editor = () => {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const id = params.get("id");
+  const space = params.get("space");
+  const {treeData} = useTreeData(space)
+  const {currentDocNode, setCurrentDocNode} = useCurrentDocNode();
 
   // const title = params.get("title");
   const { currentDocumentTitle, setCurrentDocumentTitle } = useContext(EditorContext);
   useEffect(() => {
-    console.log("getDocInfo", id);
-    getDocInfo({ id }).then((res) => {
-      console.log("getDocInfo res", res);
-      if (currentDocumentTitle !== res.data.title) {
-        setCurrentDocumentTitle(res.data.title);
-      }
-    });
-  }, [id]);
+    // console.log("getDocInfo", id);
+    // getDocInfo({ id }).then((res) => {
+    //   console.log("getDocInfo res", res);
+    //   if (currentDocumentTitle !== res.data.title) {
+    //     // setCurrentDocumentTitle(res.data.title);
+    //   }
+    // });
+
+    // treeData 中找到当前文档节点, 只有在直接url跳转时才需要, 点击菜单树节点时不需要
+    if (currentDocNode == null) { // 可能是直接url跳转场景
+      const currentDocNode = findByKey({key: id, treeData, getNodeKey: getNodeKeyFn})
+      setCurrentDocNode(currentDocNode)
+      // console.log("findByKey then setCurrentDocNode", currentDocNode, treeData?.length)
+    }
+  }, [id, treeData]); // url跳转, treeData 一开始还没来得及加载
 
   const title = currentDocumentTitle;
   console.log("Editor title", title);

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Layout, Breadcrumb, List, Typography, Button} from 'antd';
 import {Outlet, useNavigate, useParams} from "react-router-dom";
 import {Route, Routes} from 'react-router-dom';
@@ -11,6 +11,8 @@ import { EditorContextProvider } from "@/context";
 import Header from '@/layouts/header';
 import { useSettings } from '@/store/settingStore';
 import { ThemeLayout, ThemeMode } from '#/enum';
+import {useCurrentDocNode} from "@/store/docTreeStore";
+import {getSpaceName} from "@/utils/tree-data-utils";
 
 const {Content, Footer, Sider} = Layout;
 const {Title} = Typography;
@@ -40,9 +42,19 @@ export const Doc = () => {
 
   const goEdit = (item) => {
     // navigate(`/edit/${item.id}?` + toQueryString(item));
-    navigate(`/doc/edit?id=${item.id}`);
+    const space = getSpaceName(item)
+    navigate(`/doc/edit?id=${item.id}&space=${space}`);
     // setDocId(item.id)
   };
+
+  const {currentDocNode, setCurrentDocNode} = useCurrentDocNode();
+  useEffect(() => {
+    if (currentDocNode != null) {
+      console.log('currentDocNode changed, goEdit', currentDocNode)
+      goEdit(currentDocNode)
+    }
+  }, [currentDocNode])
+
   const requestAddDocument = () => {
     console.log("requestAddDocument")
     addDocument().then((res) => {

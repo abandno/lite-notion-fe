@@ -13,7 +13,7 @@ export const useSubscribeState = (sourceState) => {
  * 联动 state
  *
  * linkState 改变时, 联动修改当前 state,
- * 当前 state 改变时, 联动修改 linkState
+ * 当前 state 改变时, 联动修改 linkState (可选)
  * @param linkState
  * @param setLinkState
  */

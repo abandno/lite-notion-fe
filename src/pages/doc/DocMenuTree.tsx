@@ -2,7 +2,6 @@ import React, {Component, useState, CSSProperties, useRef, useContext, useEffect
 import SortableTree, {
   SortableTreeWithoutDndContext,
   addNodeUnderParent,
-  getTreeFromFlatData,
   removeNodeAtPath,
   TreeItem
 } from '@nosferatu500/react-sortable-tree';
@@ -10,7 +9,7 @@ import SortableTree, {
 import '@nosferatu500/react-sortable-tree/style.css'; // This only needs to be imported once in your app
 // import FileExplorerTheme from '@nosferatu500/theme-file-explorer';
 import FileExplorerTheme from '@/components/theme-file-explorer'
-import {Button, Modal, Dropdown, MenuProps, CollapseProps, Collapse, theme} from "antd";
+import {Button, Modal, Dropdown, MenuProps, CollapseProps, Collapse, theme, Tooltip} from "antd";
 import {useFocusWithin, useHover, useMount} from "ahooks";
 import {addDocument, deleteDocument, listDocument, moveNode} from "@/api";
 import {HeartIcon, MoreIcon} from "@/components/icons";
@@ -22,6 +21,8 @@ import './DocMenuTree.scss';
 import {Ellipsis} from "lucide-react";
 import {Icon} from "@components/ui/Icon.tsx";
 import {EditorContext} from "@/context";
+import {getNodeKeyFn, getTreeFromFlatData} from "@/utils/tree-data-utils.ts";
+import {useCurrentDocNode, useDocTreeStore, useMySpaceTreeStore, useTreeData} from "@/store/docTreeStore.ts";
 
 const DocMenuContext = React.createContext({
   selectedNode: null,
@@ -36,11 +37,6 @@ const DocMenuProvider = ({children}) => {
       </DocMenuContext.Provider>
   )
 }
-
-/**
- * @param { node: nextNode, treeIndex: currentIndex }
- */
-const getNodeKey = ({node, treeIndex=undefined}) => node.id
 
 const NodeDropdown = ({node, path, onAddDoc, onDeleteDoc}) => {
   const style: CSSProperties = {
@@ -130,7 +126,7 @@ export function SortableTreeCard({treeData, updateTreeData}) {
           parentKey: path[path.length - 1],
           // parentKey: node.id,
           expandParent: true,
-          getNodeKey,
+          getNodeKey: getNodeKeyFn,
           newNode: resp.data,
           addAsFirstChild: false,
         }).treeData
@@ -147,7 +143,7 @@ export function SortableTreeCard({treeData, updateTreeData}) {
             removeNodeAtPath({
               treeData,
               path,
-              getNodeKey,
+              getNodeKey: getNodeKeyFn,
             })
         );
       },
@@ -157,12 +153,13 @@ export function SortableTreeCard({treeData, updateTreeData}) {
   }
 
   const {selectedNode, setSelectedNode} = useContext(DocMenuContext);
+  const {currentDocNode, setCurrentDocNode} = useCurrentDocNode();
 
   return (
       <div style={{height: 200}}>
           <SortableTreeWithoutDndContext
               treeData={treeData}
-              getNodeKey={getNodeKey}
+              getNodeKey={getNodeKeyFn}
               onChange={onTreeChange}
               theme={FileExplorerTheme}
               onDragStateChanged={onDragStateChanged}
@@ -183,47 +180,62 @@ export function SortableTreeCard({treeData, updateTreeData}) {
                     console.log("prev", prev, "next", next);
                     const oldPid = node.pid;
                     // 旧的父节点下删除当前节点信息, 如子节点计数; 当前节点更新相关属性, 如pid,sort
+                    let newPid = nextParentNode?.id || node.pid;
                     const req = {
                       prevPid: oldPid,
                       node: {
                         id: node.id,
                         sort: ((parseFloat(prev?.sort) || -10000) + (parseFloat(next?.sort) || 10000)) / 2,
-                        pid: nextParentNode?.id || node.pid,
+                        pid: newPid,
                       }
                     }
                     console.log("onMoveNode request param:", req);
                     await moveNode(req)
 
                     setTreeData(treeData);
+                    // useMySpaceTreeStore((state) => state.actions).moveNode({oldPid, newPid, nodeId: node.id, treeItems: treeData})
                   },
                   onCancel() {
                   },
                 });
               }}
+              onVisibilityToggle={({treeData, node, expanded, path}) => {
+                console.log('onVisibilityToggle: ', node, expanded)
+              }}
               generateNodeProps={({node, path}) => ({
-                onClick: () => {
-                  // console.log('Node clicked:', node, path)
-                  setSelectedNode(node);
-                  setTreeData(treeData => treeData.slice());
+                onClick: (e) => {
+                  // e: SyntheticBaseEvent
+                  console.log('Node clicked:', node, path, e);
+                  setTimeout(() => {
+                    console.log('Node clicked: expanded: ', node.expanded);
+                  }, 500)
+                  // setSelectedNode(node);
+                  setCurrentDocNode(node);
+                  // ?? 更新状态反而不行
+                  // setTreeData(treeData => treeData.slice());
+                  // setTreeData([...treeData])
                 },
                 onDoubleClick: () => {
                   node.expanded = !node.expanded;
-                  setTreeData(treeData => treeData.slice());
+                  // setTreeData(treeData => treeData.slice());
+                  setTreeData([...treeData])
                   // console.log('onDoubleClick: Node expanded:', node.expanded);
                 },
                 onMouseEnter: () => {
                   node.isHovering = true;
+                  // console.log('onMouseEnter: ', treeData)
                   setTreeData([...treeData])
                 },
                 onMouseLeave: () => {
                   node.isHovering = false;
+                  // console.log('onMouseLeave: ', treeData)
                   setTreeData([...treeData])
                 },
                 buttons: [
                   <NodeDropdown node={node} path={path} onAddDoc={handleAddDoc} onDeleteDoc={handleDeleteDoc}/>,
                 ],
                 // 传入当前点选的节点
-                selectedNode: selectedNode,
+                selectedNode: currentDocNode,
               })}
           />
       </div>
@@ -270,22 +282,29 @@ export function DocMenuTree0({onSelectedChange}) {
     borderRadius: token.borderRadiusLG,
     border: 'none',
   };
-  const [mySpaceTreeData, setMySpaceTreeData] = useState([]);
+  // const [mySpaceTreeData, setMySpaceTreeData] = useState([]);
+  // const {treeItems: mySpaceTreeData, actions: {setTreeItems: setMySpaceTreeData}} = useMySpaceTreeStore()
+  // const {setTreeItems: setMySpaceTreeData} = useMySpaceTreeStore(state => state.actions)
   const [knowledgeBaseTreeData, setKnowledgeBaseTreeData] = useState([]);
 
-  const {currentDocumentTitle} = useContext(EditorContext);
-  useEffect(() => {
-    console.log("currentDocumentTitle change", currentDocumentTitle)
-    refreshDocument();
-  }, [currentDocumentTitle])
+  // const {currentDocumentTitle} = useContext(EditorContext);
+  // useEffect(() => {
+  //   console.log("currentDocumentTitle change", currentDocumentTitle)
+  //   refreshDocument();
+  // }, [currentDocumentTitle])
+
+  const {treeData: mySpaceTreeData, setTreeData: setMySpaceTreeData} = useTreeData("mySpace")
 
   function refreshDocument() {
     listDocument({userId: 1}).then((res) => {
       const flatItems = res.data;
       flatItems.forEach((e, ix) => {
-        e.title = e.title || "未命名"
-        e.title = e.title + "-" + e.id; //debug
+        e.titleText = e.title || "未命名"
+        // e.title = e.title + "-" + e.id; //debug
         // e.title = <span style={{color: "red"}}>{e.title}</span>
+        e.title = (<Tooltip key={e.id} title={e.id}>
+          {e.titleText}
+        </Tooltip>)
       });
       console.log("request flatItems: ", flatItems);
       // flat -> tree
@@ -295,16 +314,26 @@ export function DocMenuTree0({onSelectedChange}) {
         getParentKey: n => n.pid,
       })
       console.log("treeItems after getTreeFromFlatData", treeItems);
+      // setItems(flatItems)
       // 拆分
       const mySpace = treeItems.filter(e => e.id == 8001)[0]?.children;
       const knowledgeBases = treeItems.filter(e => e.id != 8001);
       console.log("拆分后:", mySpace, knowledgeBases);
       // mySpace 中克隆出映射在共享空间 todo
       setMySpaceTreeData(mySpace);
-      setKnowledgeBaseTreeData(knowledgeBases);
+      // setKnowledgeBaseTreeData(knowledgeBases);
       // setTreeData(treeItems);
     })
   }
+
+  // useEffect(() => {
+  //   console.log("`treeItems` changed");
+  //   // 拆分
+  //   const mySpace = treeItems.filter(e => e.id == 8001)[0]?.children;
+  //   const knowledgeBases = treeItems.filter(e => e.id != 8001);
+  //   console.log("拆分后:", mySpace, knowledgeBases);
+  //   setMySpaceTreeData(mySpace);
+  // }, [treeItems])
 
   useMount(() => {
     refreshDocument();
