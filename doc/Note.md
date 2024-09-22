@@ -49,3 +49,10 @@ https://lucide.dev/icons/
 [Hello from Slash Admin | Slash Admin](https://docs-admin.slashspaces.com/)
 这是一个后台管理模板.
 觉得可借鉴, 登录鉴权\主题配置
+
+
+[Next.js + Tiptap + ChatGPT 全栈开发知识库平台 AI 写作最近 2 个月我一直致力于【划水AI - 掘金](https://juejin.cn/post/7375504338759401510)
+大佬的AI知识库项目
+
+[划水 AI](https://www.huashuiai.com/)
+

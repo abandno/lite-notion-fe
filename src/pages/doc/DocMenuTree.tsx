@@ -21,7 +21,7 @@ import './DocMenuTree.scss';
 import {Ellipsis} from "lucide-react";
 import {Icon} from "@components/ui/Icon.tsx";
 import {EditorContext} from "@/context";
-import {getNodeKeyFn, getTreeFromFlatData} from "@/utils/tree-data-utils.ts";
+import {getNodeKeyFn, getTreeFromFlatData, updateOnMoveNode} from "@/utils/tree-data-utils.ts";
 import {useCurrentDocNode, useDocTreeStore, useMySpaceTreeStore, useTreeData} from "@/store/docTreeStore.ts";
 
 const DocMenuContext = React.createContext({
@@ -191,7 +191,7 @@ export function SortableTreeCard({treeData, updateTreeData}) {
                     }
                     console.log("onMoveNode request param:", req);
                     await moveNode(req)
-
+                    updateOnMoveNode({node, nextParent: nextParentNode})
                     setTreeData(treeData);
                     // useMySpaceTreeStore((state) => state.actions).moveNode({oldPid, newPid, nodeId: node.id, treeItems: treeData})
                   },

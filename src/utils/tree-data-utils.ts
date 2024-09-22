@@ -12,6 +12,7 @@ import {
   TreeNode,
   TreePath,
 } from '..'
+import {useDocTreeStore} from "@/store/docTreeStore.ts";
 
 /**
  * @param { node: nextNode, treeIndex: currentIndex }
@@ -1123,4 +1124,23 @@ export const getSpaceName = (node) => {
   if (root == '8001') {
     return 'mySpace'
   }
+}
+
+/**
+ * 更新被移动节点及其后代节点的 path
+ */
+export const updateOnMoveNode = ({node, nextParent}) => {
+  node.pid = nextParent.id
+  const trav = (node, path = []) => {
+    const nodeId = node.id
+    path.push(nodeId)
+    node.path = [...path]
+    if (node.children) {
+      node.children.forEach(child => trav(child, [...path]))
+    }
+    return node;
+  }
+
+  // 递归修改 path 的前部分为新 parent 的
+  trav(node, [...nextParent.path])
 }

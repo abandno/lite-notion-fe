@@ -36,6 +36,8 @@ import { useLinkState } from "@/hooks";
 import {useCurrentDocNode, useDocTreeStore, useTreeData} from "@/store/docTreeStore.ts";
 import {changeNodeAtPath, findByKey, getNodeKeyFn} from "@/utils/tree-data-utils.ts";
 import {Tooltip} from "antd";
+import {useCursorMemo} from "@components/extensions/CursorMemo/useCursorMemo.ts";
+import {CursorMemo} from "@components/extensions/CursorMemo";
 
 const colors = [
   "#958DF1",
@@ -56,8 +58,8 @@ const getInitialUser = () => {
   );
 };
 
-const buildYdoc = () => {
-  const ydoc = new Y.Doc();
+const buildYdoc = (id) => {
+  const ydoc = new Y.Doc({guid: id});
   // 用一个 clientId 有点问题, 这里的 clientId 定位估计是一个文档对应一个 clientId
   // ydoc.clientID = ClientId.getClientId();
   console.log("buildYdoc, clientId", ydoc.clientID);
@@ -270,6 +272,9 @@ const EditorInner = ({ id, title, ydoc, provider }) => {
         CollaborationCursor.configure({
           provider: provider,
         }),
+        CursorMemo.configure({
+          docId: id,
+        }),
       ],
     },
     [ydoc, provider]
@@ -298,9 +303,11 @@ const EditorInner = ({ id, title, ydoc, provider }) => {
     }
   }, [currentUser]);
 
+  // useCursorMemo(id, editor)
   if (!editor) {
     return null;
   }
+
 
   return (
     <div className="editor flex flex-col" ref={menuContainerRef}>
@@ -370,7 +377,7 @@ export const Editor = () => {
   const [ydoc, setYdoc] = useState(null);
   const [websocketProvider, setWebsocketProvider] = useState(null);
   useEffect(() => {
-    const ydoc = buildYdoc();
+    const ydoc = buildYdoc(id);
     setYdoc(ydoc);
     var provider = buildTiptapCollabProvider(id, ydoc);
     setWebsocketProvider(provider);
